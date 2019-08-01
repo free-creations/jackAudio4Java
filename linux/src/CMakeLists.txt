@@ -1,17 +1,20 @@
-project(${CMAKE_PROJECT_NAME}_lib)
+
+
+
+
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(JACK REQUIRED)
+
 
 set(HEADER_FILES
-)
+        )
 set(SOURCE_FILES
-)
+        inprocess.c
+        )
 
-if (EXISTS ${SOURCE_FILES})
-    # The library contains header and source files.
-    add_library(${CMAKE_PROJECT_NAME}_lib STATIC
-        ${SOURCE_FILES}
-        ${HEADER_FILES}
-    )
-else()
-    # The library only contains header files.
-    add_library(${CMAKE_PROJECT_NAME}_lib INTERFACE)
-endif()
+
+# The library contains header and source files.
+add_library(${LIB_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES})
+target_include_directories(${LIB_NAME} PUBLIC ${JACK_INCLUDE_DIR})
