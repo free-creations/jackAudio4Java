@@ -1,9 +1,9 @@
 # Native Part of JackAudio4Java
 
 ## Required modules
-
+To build and test the project from sources, we will need the following tools to be installed:
 - `Git`
 - `CMake`
-- optional `Doxyfile` if you want to build the documentation.
 
-Note: Google- test will be downloaded from [Github](https://github.com/google/googletest)
+Note: `Google-test` will be downloaded from [Github](https://github.com/google/googletest) 
+during the build process.

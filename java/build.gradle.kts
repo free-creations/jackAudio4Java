@@ -25,4 +25,7 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation("junit:junit:4.12")
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.9")
 }
