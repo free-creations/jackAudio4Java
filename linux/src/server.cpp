@@ -25,12 +25,12 @@
 
 
 JNIEXPORT void JNICALL Java_jackAudio4Java_Server_jack_1get_1version_1n
-(JNIEnv *, jclass, jobject, jobject, jobject, jobject){
+        (JNIEnv *, jclass, jobject, jobject, jobject, jobject) {
 
 }
 
 
-JNIEXPORT int JNICALL test
-        (int variable){
+
+JNIEXPORT int JNICALL XXXJava_jackAudio4Java_Server_test(int variable) {
     return variable;
 }
