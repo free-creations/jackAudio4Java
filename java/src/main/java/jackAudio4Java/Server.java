@@ -31,17 +31,28 @@ public class Server {
       Int major_ptr,
       Int minor_ptr,
       Int micro_ptr,
-      Int proto_ptr){
-    Validate.notNull(major_ptr, "major_ptr can't be null");
-    Validate.notNull(minor_ptr, "minor_ptr can't be null");
-    Validate.notNull(micro_ptr, "micro_ptr can't be null");
-    Validate.notNull(proto_ptr, "proto_ptr can't be null");
-    jack_get_version_n(major_ptr, minor_ptr, micro_ptr, proto_ptr);
+      Int proto_ptr) {
+    Validate.notNull(major_ptr, "major_ptr shall not be null");
+    Validate.notNull(minor_ptr, "minor_ptr shall not be null");
+    Validate.notNull(micro_ptr, "micro_ptr shall not be null");
+    Validate.notNull(proto_ptr, "proto_ptr shall not be null");
+    _jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
   }
-  private native static void jack_get_version_n(
+
+  private native static void _jack_get_version(
       Int major_ptr,
       Int minor_ptr,
       Int micro_ptr,
       Int proto_ptr);
 
+  /**
+   * Call this function to get the version of the JNI-DLL in form of a single integer.
+   *
+   * @return the version of the Java-Native-Interface
+   */
+  public static int jni_get_version() {
+    return _jni_get_version();
+  }
+
+  private native static int _jni_get_version();
 }

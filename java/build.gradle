@@ -17,5 +17,6 @@ dependencies {
 }
 
 compileJava {
-  options.compilerArgs += ["-h", file("$rootDir/../linux/src/jni_headers")]
+  // @todo: when gradle is called from the "java" sub-project, the header files are written to the wrong location.
+  options.compilerArgs += ["-h", file("$rootDir/linux/src/jni_headers")]
 }
