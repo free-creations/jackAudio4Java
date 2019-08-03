@@ -2,7 +2,7 @@
 # File        : CMakeLists.txt
 # Description : CMake-script to build and test the JNI Library.
 #
-# Copyright 2019 Harald Postner (www.h-postner.de)
+# Copyright 2019 Harald Postner (www.free-creations.de)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,17 @@
 cmake_minimum_required(VERSION 3.14)
 project(jackAudio4Java)
 
-# The library name shall be be the project name with "_lib" appended and downcased
-string( TOLOWER ${CMAKE_PROJECT_NAME}_lib LIB_NAME )
+# we need the header files for the Jack library
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+find_package(JACK REQUIRED)
+
+# we need the header files of the Java Development Kit.
+find_package(JNI REQUIRED)
+
+set(VERSION "0.0.0")
+
+# The library name shall be be the downcased project-name with "_lib" and version appended.
+string( TOLOWER ${CMAKE_PROJECT_NAME}_lib_${VERSION} LIB_NAME )
 
 set(CMAKE_CXX_STANDARD 17)
 

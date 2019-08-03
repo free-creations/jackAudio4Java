@@ -15,6 +15,10 @@ extern "C" {
 JNIEXPORT void JNICALL Java_jackAudio4Java_Server_jack_1get_1version_1n
   (JNIEnv *, jclass, jobject, jobject, jobject, jobject);
 
+
+JNIEXPORT int JNICALL test
+        (int variable);
+
 #ifdef __cplusplus
 }
 #endif

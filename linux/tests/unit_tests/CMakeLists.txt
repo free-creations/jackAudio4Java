@@ -1,6 +1,9 @@
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-add_executable(unit_Tests_run test_example.cpp)
+set(UNIT_TEST_EXE_NAME unit_Tests_run)
 
-target_link_libraries(unit_Tests_run gtest gtest_main)
-target_link_libraries(unit_Tests_run ${CMAKE_PROJECT_NAME}_lib)
+add_executable(${UNIT_TEST_EXE_NAME} test_server.cpp)
+
+target_link_libraries(${UNIT_TEST_EXE_NAME} gtest gtest_main)
+target_link_libraries(${UNIT_TEST_EXE_NAME} ${LIB_NMAE})
+target_include_directories(${UNIT_TEST_EXE_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/src  ${JACK_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})
