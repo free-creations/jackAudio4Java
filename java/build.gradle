@@ -1,0 +1,21 @@
+plugins {
+  id 'java-library'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+
+  // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
+}
+
+compileJava {
+  options.compilerArgs += ["-h", file("$rootDir/../linux/src/jni_headers")]
+}
