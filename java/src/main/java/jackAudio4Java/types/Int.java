@@ -15,6 +15,10 @@
  */
 package jackAudio4Java.types;
 
+/**
+ * Container of an Integer value.
+ * Permits to pass integers by reference, as is often used in C programming.
+ */
 public class Int {
   public int value;
 }

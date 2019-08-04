@@ -22,32 +22,46 @@ public class Server {
   /**
    * Call this function to get the version of the JACK-server in form of several numbers.
    *
-   * @param major_ptr Integer object receiving major version of JACK.
-   * @param minor_ptr Integer object receiving minor version of JACK.
-   * @param micro_ptr Integer object receiving micro version of JACK.
-   * @param proto_ptr Integer object receiving protocol version of JACK.
+   * @param majorRef Integer- container receiving major version of JACK.
+   * @param minorRef Integer- container receiving minor version of JACK.
+   * @param microRef Integer- container receiving micro version of JACK.
+   * @param protoRef Integer- container receiving protocol version of JACK.
    */
   public static void jack_get_version(
-      Int major_ptr,
-      Int minor_ptr,
-      Int micro_ptr,
-      Int proto_ptr) {
-    Validate.notNull(major_ptr, "major_ptr shall not be null");
-    Validate.notNull(minor_ptr, "minor_ptr shall not be null");
-    Validate.notNull(micro_ptr, "micro_ptr shall not be null");
-    Validate.notNull(proto_ptr, "proto_ptr shall not be null");
-    _jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
+      Int majorRef,
+      Int minorRef,
+      Int microRef,
+      Int protoRef) {
+    Validate.notNull(majorRef, "majorRef shall not be null");
+    Validate.notNull(minorRef, "minorRef shall not be null");
+    Validate.notNull(microRef, "microRef shall not be null");
+    Validate.notNull(protoRef, "protoRef shall not be null");
+    _jack_get_version(majorRef, minorRef, microRef, protoRef);
   }
 
   private native static void _jack_get_version(
-      Int major_ptr,
-      Int minor_ptr,
-      Int micro_ptr,
-      Int proto_ptr);
+      Int majorRef,
+      Int minorRef,
+      Int microRef,
+      Int protoRef);
 
   /**
-   * Call this function to get the version of the JNI-DLL in form of a single integer.
-   *
+   * Call this function to get the version of the native Java-method interface.
+   * <p>
+   *   The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
+   *   At the time of writing, the following constants were defined:
+   * </p>
+   * <p><ul>
+   * <li> JNI_VERSION_1_1 0x00010001
+   * <li> JNI_VERSION_1_2 0x00010002
+   * <li> JNI_VERSION_1_4 0x00010004
+   * <li> JNI_VERSION_1_6 0x00010006
+   * <li> JNI_VERSION_1_8 0x00010008
+   * <li> JNI_VERSION_9   0x00090000
+   * <li> JNI_VERSION_10  0x000a0000
+   * </ul></p>
+   * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">
+   *   Java Native Interface Specification</a>
    * @return the version of the Java-Native-Interface
    */
   public static int jni_get_version() {

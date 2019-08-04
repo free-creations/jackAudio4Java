@@ -18,12 +18,38 @@
  */
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "jnimock/jnimock.h"
+
 #include "jni_headers/jackAudio4Java_Server.h"
 
-TEST(Example, Equals) {
-    EXPECT_EQ(4711, XXXJava_jackAudio4Java_Server_test(4711));
+using testing::Return;
+using namespace jnimock;
+
+TEST(Server, jack_get_version) {
+    JNIEnv * env = nullptr;
+    jclass clazz = nullptr;
+    jobject major_ptr = nullptr;
+    jobject minor_ptr = nullptr;
+    jobject micro_ptr = nullptr;
+    jobject proto_ptr = nullptr;
+
+    Java_jackAudio4Java_Server__1jack_1get_1version(env, clazz, major_ptr, minor_ptr, micro_ptr, proto_ptr);
 }
 
-TEST(Server_get_version, Equals) {
-    EXPECT_EQ(4711, XXXJava_jackAudio4Java_Server_test(4711));
+TEST(Server, jni_get_version) {
+    // Create a JNIEnvMock object (JNIEnvMock extends JNIEnv)
+    JNIEnvMock * jniEnvMock =  createJNIEnvMock();
+    jclass clazz = nullptr;
+
+    // the jniEnvMock shall return JNI_VERSION_1_6 as its version
+    EXPECT_CALL(*jniEnvMock, GetVersion())
+            .Times(1)
+            .WillOnce(Return(JNI_VERSION_1_6));
+
+    jint version =  Java_jackAudio4Java_Server__1jni_1get_1version(jniEnvMock, clazz);
+    EXPECT_EQ(version, JNI_VERSION_1_6);
+
+    // Destroy the created JNIEnvMock object
+    destroyJNIEnvMock(jniEnvMock);
 }

@@ -2,8 +2,9 @@
 build/
 
 # Google Tests
-tests/lib/
+/tests/lib/googletest/
 
 # Jet Brains
 .idea/
 cmake-build-debug/
+

@@ -19,18 +19,73 @@
 #include <jni.h>
 #include "jni_headers/jackAudio4Java_Server.h"
 
+#include <string>
+#include <iostream>
+
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
 #endif
+using namespace std;
+
+/**
+ * Utilities
+ * =========
+ * @ToDo put them in a separate source file
+ */
+
+void Int_push_value(JNIEnv * env, const jint &value, jobject container ){
+    if (!container) return; // if null, do nothing.
+    if (!env) return;       // if null, do nothing.
 
 
-JNIEXPORT void JNICALL Java_jackAudio4Java_Server_jack_1get_1version_1n
-        (JNIEnv *, jclass, jobject, jobject, jobject, jobject) {
 
 }
+/**
+ * End of Utilities
+ */
 
+/**
+ * Call this function to get the version of the JACK-server in form of several numbers.
+ *
+ * @param majorRef Integer- container receiving major version of JACK.
+ * @param minorRef Integer- container receiving minor version of JACK.
+ * @param microRef Integer- container receiving micro version of JACK.
+ * @param protoRef Integer- container receiving protocol version of JACK.
+ */
+JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
+        (JNIEnv *env, jclass, jobject majorRef, jobject minorRef, jobject microRef, jobject protoRef) {
+    // @Todo replace these assignments by a call to JACK
+    int majorVal = 1;
+    int minorVal = 2;
+    int microVal = 3;
+    int protoVal = 4;
 
+    Int_push_value(env, majorVal, majorRef);
+    Int_push_value(env, minorVal, minorRef);
+    Int_push_value(env, microVal, microRef);
+    Int_push_value(env, protoVal, protoRef);
+}
 
-JNIEXPORT int JNICALL XXXJava_jackAudio4Java_Server_test(int variable) {
-    return variable;
+/**
+ * Call this function to get the version of the native Java-method-interface.
+ * <p>
+ *   The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
+ *   At the time of writing, the following constants were defined:
+ * </p>
+ * <p><ul>
+ * <li> JNI_VERSION_1_1 0x00010001
+ * <li> JNI_VERSION_1_2 0x00010002
+ * <li> JNI_VERSION_1_4 0x00010004
+ * <li> JNI_VERSION_1_6 0x00010006
+ * <li> JNI_VERSION_1_8 0x00010008
+ * <li> JNI_VERSION_9   0x00090000
+ * <li> JNI_VERSION_10  0x000a0000
+ * </ul></p>
+ * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">
+ *   Java Native Interface Specification</a>
+ * @return the version of the Java-Native-Interface
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Server__1jni_1get_1version
+        (JNIEnv *env, jclass) {
+    return env->GetVersion();
 }
