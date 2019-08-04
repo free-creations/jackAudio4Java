@@ -18,31 +18,15 @@
  */
 #include <jni.h>
 #include "jni_headers/jackAudio4Java_Server.h"
-
-#include <string>
-#include <iostream>
+#include "utils.h"
 
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
 #endif
 using namespace std;
 
-/**
- * Utilities
- * =========
- * @ToDo put them in a separate source file
- */
-
-void Int_push_value(JNIEnv * env, const jint &value, jobject container ){
-    if (!container) return; // if null, do nothing.
-    if (!env) return;       // if null, do nothing.
 
 
-
-}
-/**
- * End of Utilities
- */
 
 /**
  * Call this function to get the version of the JACK-server in form of several numbers.

@@ -22,6 +22,6 @@
 
 #
 add_library(${LIB_NAME} SHARED)
-target_sources(${LIB_NAME} PUBLIC server.cpp)
+target_sources(${LIB_NAME} PUBLIC server.cpp utils.cpp)
 target_include_directories(${LIB_NAME} PUBLIC ${JACK_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})
 target_link_libraries(${LIB_NAME} ${JNI_LIBRARIES})
