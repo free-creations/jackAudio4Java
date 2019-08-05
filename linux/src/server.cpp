@@ -44,10 +44,10 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
     int microVal = 3;
     int protoVal = 4;
 
-    Int_push_value(env, majorVal, majorRef);
-    Int_push_value(env, minorVal, minorRef);
-    Int_push_value(env, microVal, microRef);
-    Int_push_value(env, protoVal, protoRef);
+    Int::pushValue(env, majorVal, majorRef);
+    Int::pushValue(env, minorVal, minorRef);
+    Int::pushValue(env, microVal, microRef);
+    Int::pushValue(env, protoVal, protoRef);
 }
 
 /**

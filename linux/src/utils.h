@@ -21,7 +21,8 @@
 
 #include <jni.h>
 
-void Int_push_value(JNIEnv * env, const jint &value, jobject container );
-
-
+class Int {
+public:
+    static void pushValue(JNIEnv *env, const jint &value, jobject container);
+};
 #endif //JACKAUDIO4JAVA_UTILS_H

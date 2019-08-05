@@ -22,39 +22,22 @@
 #include "jnimock/jnimock.h"
 
 #include "jni_headers/jackAudio4Java_Server.h"
-#include "utils.h"
 
 using testing::Return;
 using namespace jnimock;
 
-/**
- * Utilities
- * =========
- * @ToDo put them in a separate source file
- */
-
-TEST(Util, Int_push_value) {
-    JNIEnv *env = nullptr;
-    jobject container = nullptr;
-    jint value = 0;
-
-    Int_push_value(env, value, container);
-    EXPECT_TRUE(false) << "test to be implemented";
-}
-
-/**
- * End of Utilities
- */
 
 TEST(Server, jack_get_version) {
-    JNIEnv *env = nullptr;
-    jclass clazz = nullptr;
+    JNIEnvMock *jniEnvMock = createJNIEnvMock();
+
     jobject major_ptr = nullptr;
     jobject minor_ptr = nullptr;
     jobject micro_ptr = nullptr;
     jobject proto_ptr = nullptr;
 
-    Java_jackAudio4Java_Server__1jack_1get_1version(env, clazz, major_ptr, minor_ptr, micro_ptr, proto_ptr);
+    Java_jackAudio4Java_Server__1jack_1get_1version(jniEnvMock, nullptr, major_ptr, minor_ptr, micro_ptr, proto_ptr);
+
+    destroyJNIEnvMock(jniEnvMock);
 }
 
 TEST(Server, jni_get_version) {
