@@ -18,5 +18,18 @@ dependencies {
 
 compileJava {
   // @todo: when gradle is called from the "java" sub-project, the header files are written to the wrong location.
-  options.compilerArgs += ["-h", file("$rootDir/linux/src/jni_headers")]
+  options.compilerArgs += ["-h", file("../linux/src/jni_headers")]
 }
+/*
+task runApp(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'InstanceMethodCall'
+
+  //
+  //jvmArgs "-ea", "-DjackAudio4java.library=${file("../linux/cmake-build-debug/src/libinstancemethodcall_lib_0.0.0.so")}"
+  jvmArgs  "-verbose:jni" "-DjackAudio4java.library=${file("../linux/cmake-build-debug/src/libinstancemethodcall_lib_0.0.0.so")}"
+
+}
+
+ */

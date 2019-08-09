@@ -20,8 +20,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "jnimock/jnimock.h"
-
-#include "utils.h"
+#include "types_Int.h"
 #include "jni.h"
 
 using testing::Return;
@@ -32,25 +31,28 @@ using ::testing::NiceMock;
 
 struct _jfieldID {
 }; // jni.h only defines a forward reference. So we complete the definition with an empty struct here. Thus we will be
-// able to allocate objects of type _jfieldID.
+// able to create empty objects of type _jfieldID.
 
 /**
- * When the `value` field of the Int container cannot be accessed, pushValue shall throw an exception.
+ * When the `value` field of the Int container cannot be accessed, pushValue shall throw Fatal Exception into the JVM.
  */
-TEST(UtilInt, pushValue_InvalidField) {
-    NiceMock<JNIEnvMock> jniEnvMock; // Note: "NiceMock" does not nag with "Uninteresting mock function call" warnings.
-    _jobject container;
-    jint value = 4711;
+TEST(types_Int, pushValue_initialiseRefs) {
+    NiceMock<JNIEnvMock> jniEnvMock; // Note: "NiceMock" does not nag with useless warnings.
+    _jclass clazz;
 
-    // By default, jniEnvMock.GetFieldID will return a null address
+    // Make the jniEnvMock.GetFieldID return a null address
+    ON_CALL(jniEnvMock, GetFieldID(_, _, _))
+            .WillByDefault(Return(nullptr));
 
-    EXPECT_THROW(Int::pushValue(&jniEnvMock, value, &container), std::invalid_argument);
+    // so we expect fatal error to be thrown
+    EXPECT_CALL(jniEnvMock, FatalError(_))
+            .Times(1);
 
-
+    Java_jackAudio4Java_types_Int_initialiseRefs(&jniEnvMock, &clazz);
 }
 /**
  * When the container can be accessed, pushValue shall set the field through a call to env.SetIntField
- */
+ *
 TEST(UtilInt, pushValue_success) {
     NiceMock<JNIEnvMock> jniEnvMock; // NiceMock avoids "Uninteresting mock function call" warnings.
     _jobject container;
@@ -61,7 +63,7 @@ TEST(UtilInt, pushValue_success) {
     // make the jniEnvMock behave as if class and field were OK.
     ON_CALL(jniEnvMock, GetObjectClass(&container))
             .WillByDefault(Return(&clazz));
-    ON_CALL(jniEnvMock, GetFieldID(&clazz,StrEq("value"), StrEq("I")))
+    ON_CALL(jniEnvMock, GetFieldID(&clazz, StrEq("value"), StrEq("I")))
             .WillByDefault(Return(&fid));
 
     // check that the value is really pushed...
@@ -71,4 +73,4 @@ TEST(UtilInt, pushValue_success) {
     Int::pushValue(&jniEnvMock, value, &container);
 }
 
-
+*/

@@ -16,9 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This unit implements the native methods of the Java class: `jackAudio4Java.Server`
+ *
+ */
 #include <jni.h>
 #include "jni_headers/jackAudio4Java_Server.h"
-#include "utils.h"
+#include "types_Int.h"
+
 
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
@@ -29,6 +35,8 @@ using namespace std;
 
 
 /**
+ * Function `private native static void _jack_get_version(Int majorRef, Int minorRef, Int microRef,Int protoRef);`
+ *
  * Call this function to get the version of the JACK-server in form of several numbers.
  *
  * @param majorRef Integer- container receiving major version of JACK.
@@ -44,10 +52,10 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
     int microVal = 3;
     int protoVal = 4;
 
-    Int::pushValue(env, majorVal, majorRef);
-    Int::pushValue(env, minorVal, minorRef);
-    Int::pushValue(env, microVal, microRef);
-    Int::pushValue(env, protoVal, protoRef);
+    Java_jackAudio4Java_types_Int_setValue(env,(jIntObject)majorRef, majorVal);
+    Java_jackAudio4Java_types_Int_setValue(env,(jIntObject)minorRef, minorVal);
+    Java_jackAudio4Java_types_Int_setValue(env,(jIntObject)microRef, microVal);
+    Java_jackAudio4Java_types_Int_setValue(env,(jIntObject)protoRef, protoVal);
 }
 
 /**

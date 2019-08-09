@@ -1,5 +1,5 @@
 /*
- * File: utils.h
+ * File: types_Int.h
  *
  *
  * Copyright 2019 Harald Postner <Harald at free_creations.de>.
@@ -16,13 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef JACKAUDIO4JAVA_UTILS_H
-#define JACKAUDIO4JAVA_UTILS_H
+#ifndef JACKAUDIO4JAVA_TYPES_INT_H
+#define JACKAUDIO4JAVA_TYPES_INT_H
 
-#include <jni.h>
+#include "jni_headers/jackAudio4Java_types_Int.h"
 
-class Int {
-public:
-    static void pushValue(JNIEnv *env, const jint &value, jobject container);
+
+class _jIntObject : public _jobject {
 };
-#endif //JACKAUDIO4JAVA_UTILS_H
+
+typedef _jIntObject *jIntObject;
+
+
+/*
+ * Class:     jackAudio4Java_types_Int
+ * Method:    setValue
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_setValue
+        (JNIEnv *, jIntObject, jint);
+
+#endif //JACKAUDIO4JAVA_TYPES_INT_H

@@ -48,8 +48,9 @@ public class Server {
   /**
    * Call this function to get the version of the native Java-method interface.
    * <p>
-   *   The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
-   *   At the time of writing, the following constants were defined:
+   * The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
+   * </p><p>
+   * At the time of writing, the following constants were defined:
    * </p>
    * <p><ul>
    * <li> JNI_VERSION_1_1 0x00010001
@@ -60,9 +61,10 @@ public class Server {
    * <li> JNI_VERSION_9   0x00090000
    * <li> JNI_VERSION_10  0x000a0000
    * </ul></p>
-   * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">
-   *   Java Native Interface Specification</a>
+   *
    * @return the version of the Java-Native-Interface
+   * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">
+   * Java Native Interface Specification</a>
    */
   public static int jni_get_version() {
     return _jni_get_version();
