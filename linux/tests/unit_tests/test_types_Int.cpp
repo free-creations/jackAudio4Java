@@ -27,7 +27,7 @@ using testing::Return;
 using testing::StrEq;
 using ::testing::_;
 using namespace jnimock;
-using ::testing::NiceMock;
+using ::testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
 
 struct _jfieldID {
 }; // jni.h only defines a forward reference. So we complete the definition with an empty struct here. Thus we will be
@@ -37,7 +37,7 @@ struct _jfieldID {
  * When the `value` field of the Int container cannot be accessed, pushValue shall throw Fatal Exception into the JVM.
  */
 TEST(types_Int, pushValue_initialiseRefs) {
-    NiceMock<JNIEnvMock> jniEnvMock; // Note: "NiceMock" does not nag with useless warnings.
+    NiceMock<JNIEnvMock> jniEnvMock;
     _jclass clazz;
 
     // Make the jniEnvMock.GetFieldID return a null address

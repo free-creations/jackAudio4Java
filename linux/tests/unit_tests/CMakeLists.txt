@@ -24,8 +24,8 @@ set(UNIT_TEST_EXE_NAME unit_Tests_run)
 add_executable(${UNIT_TEST_EXE_NAME})
 
 target_sources(${UNIT_TEST_EXE_NAME} PRIVATE
-        test_jackAudio4Java_Server.cpp
-        test_jackAudio4Java_types_Int.cpp
+        test_Server.cpp
+        test_types_Int.cpp
         ${CMAKE_SOURCE_DIR}/tests/lib/jnimock/jnimock.cpp)
 
 target_link_libraries(${UNIT_TEST_EXE_NAME} gtest gtest_main gmock gmock_main)

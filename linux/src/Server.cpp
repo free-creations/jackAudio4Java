@@ -22,7 +22,7 @@
  *
  */
 #include <jni.h>
-#include "jni_headers/jackAudio4Java_Server.h"
+#include "Server.h"
 #include "types_Int.h"
 
 

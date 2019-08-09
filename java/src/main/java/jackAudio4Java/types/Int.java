@@ -18,15 +18,15 @@ package jackAudio4Java.types;
 /**
  * Container of an Integer value.
  * Permits to pass integers by reference, as is often used in C programming.
+ * Note: the java.lang.Integer class is not suitable, as this class is immutable.
  */
 public class Int {
   /**
-   * The native class initializer will cache access information, for later use in C++.
+   * The native class initializer shall cache fieldIDs and functionsIDs, for later use in C++.
    * This follows the recommendations given by IBM here:
    * https://www.ibm.com/developerworks/library/j-jni/index.html#notc
    **/
   private static native void initialiseRefs();
-
 
   static {
     initialiseRefs();

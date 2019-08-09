@@ -21,38 +21,39 @@
 #include "gmock/gmock.h"
 #include "jnimock/jnimock.h"
 
-#include "jni_headers/jackAudio4Java_Server.h"
+#include "Server.h"
 
 using testing::Return;
+using testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
+using testing::_;
 using namespace jnimock;
 
 
 TEST(Server, jack_get_version) {
-    JNIEnvMock *jniEnvMock = createJNIEnvMock();
+
+    NiceMock<JNIEnvMock> jniEnvMock;
 
     jobject major_ptr = nullptr;
     jobject minor_ptr = nullptr;
     jobject micro_ptr = nullptr;
     jobject proto_ptr = nullptr;
 
-    Java_jackAudio4Java_Server__1jack_1get_1version(jniEnvMock, nullptr, major_ptr, minor_ptr, micro_ptr, proto_ptr);
+    Java_jackAudio4Java_Server__1jack_1get_1version(&jniEnvMock, nullptr, major_ptr, minor_ptr, micro_ptr, proto_ptr);
 
-    destroyJNIEnvMock(jniEnvMock);
 }
+/**
+ * The version returned by function `Sever.jni_get_version` shall be the version given by `jniEnv.GetVersion`.
+ */
+TEST(Sever, jni_get_version) {
 
-TEST(Server, jni_get_version) {
-    // Create a JNIEnvMock object (JNIEnvMock extends JNIEnv)
-    JNIEnvMock *jniEnvMock = createJNIEnvMock();
+    NiceMock<JNIEnvMock> jniEnvMock;
     jclass clazz = nullptr;
 
-    // the jniEnvMock shall return JNI_VERSION_1_6 as its version
-    EXPECT_CALL(*jniEnvMock, GetVersion())
-            .Times(1)
-            .WillOnce(Return(JNI_VERSION_1_6));
+    // make the jniEnvMock return JNI_VERSION_1_6 as its version
+    ON_CALL(jniEnvMock, GetVersion())
+            .WillByDefault(Return(JNI_VERSION_1_6));
 
-    jint version = Java_jackAudio4Java_Server__1jni_1get_1version(jniEnvMock, clazz);
+    // verify what Java_jackAudio4Java_Server__1jni_1get_1version returns as version.
+    jint version = Java_jackAudio4Java_Server__1jni_1get_1version(&jniEnvMock, clazz);
     EXPECT_EQ(version, JNI_VERSION_1_6);
-
-    // Destroy the created JNIEnvMock object
-    destroyJNIEnvMock(jniEnvMock);
 }
