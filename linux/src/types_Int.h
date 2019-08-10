@@ -16,24 +16,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef JACKAUDIO4JAVA_TYPES_INT_H
-#define JACKAUDIO4JAVA_TYPES_INT_H
+#pragma once
 
 #include "jni_headers/jackAudio4Java_types_Int.h"
 
+namespace types {
+    class _jIntObject : public _jobject {
+    };
 
-class _jIntObject : public _jobject {
-};
+    typedef _jIntObject *jIntObject;
 
-typedef _jIntObject *jIntObject;
+    namespace Int {
+        void initialiseRefs(JNIEnv *env, jclass clazz);
+        void setValue(JNIEnv *env, jIntObject IntContainer, jint value);
+    }
+}
 
 
-/*
- * Class:     jackAudio4Java_types_Int
- * Method:    setValue
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_setValue
-        (JNIEnv *, jIntObject, jint);
 
-#endif //JACKAUDIO4JAVA_TYPES_INT_H

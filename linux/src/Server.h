@@ -16,8 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef JACKAUDIO4JAVA_SERVER_H
-#define JACKAUDIO4JAVA_SERVER_H
+#pragma once
 
 #include "jni_headers/jackAudio4Java_Server.h"
-#endif //JACKAUDIO4JAVA_SERVER_H
+

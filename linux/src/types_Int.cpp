@@ -30,6 +30,12 @@
 #error "Needs Java version 1.2 or higher.\n"
 #endif
 
+/* map the names chosen by the java-header tool to our names */
+JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_initialiseRefs(JNIEnv *env, jclass clazz){
+    types::Int::initialiseRefs(env, clazz);
+}
+
+
 /**
  * The cached field ID of the Java field `jackAudio4Java_types_Int.value`.
  *
@@ -43,20 +49,36 @@ static jfieldID Java_jackAudio4Java_types_Int_value_ID = nullptr;
  * This follows the recommendations given by IBM here:
  * https://www.ibm.com/developerworks/library/j-jni/index.html#notc
  **/
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_initialiseRefs(JNIEnv * env, jclass clazz){
-    // cache the field ID.
-    // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
-    Java_jackAudio4Java_types_Int_value_ID = env->GetFieldID(clazz,"value", "I");
-    if(!Java_jackAudio4Java_types_Int_value_ID)
-        env->FatalError("JNI Fatal Error - class `jackAudio4Java_types_Int` has no `value` field");
-}
+
 
 /*
- * Class:     jackAudio4Java_types_Int
- * Method:    setValue
- * Signature: (I)V
+ * This namespace implements the native functions of the Java class `jackAudio4Java.types.Int`.
  */
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_setValue
-        (JNIEnv * env, jIntObject IntContainer, jint value){
-    env->SetIntField(IntContainer,Java_jackAudio4Java_types_Int_value_ID, value);
+namespace types{
+    namespace Int {
+        /**
+         *
+         * @param env
+         * @param clazz
+         */
+        void initialiseRefs(JNIEnv *env, jclass clazz) {
+            // cache the field ID.
+            // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
+            Java_jackAudio4Java_types_Int_value_ID = env->GetFieldID(clazz, "value", "I");
+            if (!Java_jackAudio4Java_types_Int_value_ID)
+                env->FatalError("JNI Fatal Error - class `jackAudio4Java_types_Int` has no `value` field");
+        }
+
+
+        /**
+        *
+        * @param env
+        * @param IntContainer
+        * @param value
+        */
+        void setValue(JNIEnv *env, jIntObject IntContainer, jint value) {
+            env->SetIntField(IntContainer, Java_jackAudio4Java_types_Int_value_ID, value);
+        }
+
+    }
 }

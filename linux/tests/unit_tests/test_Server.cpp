@@ -44,7 +44,7 @@ TEST(Server, jack_get_version) {
 /**
  * The version returned by function `Sever.jni_get_version` shall be the version given by `jniEnv.GetVersion`.
  */
-TEST(Sever, jni_get_version) {
+TEST(Server, jni_get_version) {
 
     NiceMock<JNIEnvMock> jniEnvMock;
     jclass clazz = nullptr;

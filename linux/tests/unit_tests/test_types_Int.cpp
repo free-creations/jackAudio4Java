@@ -27,29 +27,33 @@ using testing::Return;
 using testing::StrEq;
 using ::testing::_;
 using namespace jnimock;
+using namespace types;
+using namespace types::Int;
 using ::testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
 
 struct _jfieldID {
 }; // jni.h only defines a forward reference. So we complete the definition with an empty struct here. Thus we will be
 // able to create empty objects of type _jfieldID.
 
+
+
 /**
  * When the `value` field of the Int container cannot be accessed, pushValue shall throw Fatal Exception into the JVM.
  */
-TEST(types_Int, pushValue_initialiseRefs) {
-    NiceMock<JNIEnvMock> jniEnvMock;
-    _jclass clazz;
+    TEST(types_Int, pushValue_initialiseRefs) {
+        NiceMock<JNIEnvMock> jniEnvMock;
+        _jclass clazz;
 
-    // Make the jniEnvMock.GetFieldID return a null address
-    ON_CALL(jniEnvMock, GetFieldID(_, _, _))
-            .WillByDefault(Return(nullptr));
+        // Make the jniEnvMock.GetFieldID return a null address
+        ON_CALL(jniEnvMock, GetFieldID(_, _, _))
+                .WillByDefault(Return(nullptr));
 
-    // so we expect fatal error to be thrown
-    EXPECT_CALL(jniEnvMock, FatalError(_))
-            .Times(1);
+        // so we expect fatal error to be thrown
+        EXPECT_CALL(jniEnvMock, FatalError(_))
+                .Times(1);
 
-    Java_jackAudio4Java_types_Int_initialiseRefs(&jniEnvMock, &clazz);
-}
+        Java_jackAudio4Java_types_Int_initialiseRefs(&jniEnvMock, &clazz);
+    }
 /**
  * When the container can be accessed, pushValue shall set the field through a call to env.SetIntField
  *
@@ -74,3 +78,4 @@ TEST(UtilInt, pushValue_success) {
 }
 
 */
+
