@@ -25,31 +25,9 @@
 #include <jni.h>
 #include "types_Int.h"
 
-
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
 #endif
-
-/* map the names chosen by the java-header tool to our names */
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_initialiseRefs(JNIEnv *env, jclass clazz){
-    types::Int::initialiseRefs(env, clazz);
-}
-
-
-/**
- * The cached field ID of the Java field `jackAudio4Java_types_Int.value`.
- *
- * Note: the IDs returned for a given class don't change for the lifetime of the JVM process.
- * Thus we do not have to worry about race conditions or different environments having different classIDs.
- */
-static jfieldID Java_jackAudio4Java_types_Int_value_ID = nullptr;
-
-/**
- * The native class initializer will cache access information, for later use in C++.
- * This follows the recommendations given by IBM here:
- * https://www.ibm.com/developerworks/library/j-jni/index.html#notc
- **/
-
 
 /*
  * This namespace implements the native functions of the Java class `jackAudio4Java.types.Int`.
@@ -57,28 +35,38 @@ static jfieldID Java_jackAudio4Java_types_Int_value_ID = nullptr;
 namespace types{
     namespace Int {
         /**
+         * The cached field ID of the Java field `jackAudio4Java_types_Int.value`.
          *
-         * @param env
-         * @param clazz
+         * Note: the IDs returned for a given class don't change for the lifetime of the JVM process.
+         * Thus we do not have to worry about race conditions or different environments having different classIDs.
          */
-        void initialiseRefs(JNIEnv *env, jclass clazz) {
-            // cache the field ID.
-            // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
-            Java_jackAudio4Java_types_Int_value_ID = env->GetFieldID(clazz, "value", "I");
-            if (!Java_jackAudio4Java_types_Int_value_ID)
-                env->FatalError("JNI Fatal Error - class `jackAudio4Java_types_Int` has no `value` field");
-        }
+         static jfieldID value_ID = nullptr;
 
 
         /**
-        *
-        * @param env
-        * @param IntContainer
-        * @param value
+        * Sets the `value` field.
+        * @param env pointer to the JNI environment.
+        * @param IntContainer JNI- reference to the Int container object.
+        * @param value the new value.
         */
         void setValue(JNIEnv *env, jIntObject IntContainer, jint value) {
-            env->SetIntField(IntContainer, Java_jackAudio4Java_types_Int_value_ID, value);
+            env->SetIntField(IntContainer, value_ID, value);
         }
 
     }
+}
+
+/**
+ * The native class initializer will cache access information, for later use in C++.
+ * This follows the recommendations given by IBM here:
+ * https://www.ibm.com/developerworks/library/j-jni/index.html#notc
+ * @param env pointer to the JNI environment.
+ * @param clazz JNI reference to the Java- class of the Int container.
+ */
+JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_initialiseRefs(JNIEnv *env, jclass clazz){
+    // cache field IDs.
+    // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
+    types::Int::value_ID = env->GetFieldID(clazz, "value", "I");
+    if (!types::Int::value_ID)
+        env->FatalError("JNI Fatal Error - class `jackAudio4Java_types_Int` has no `value` field");
 }

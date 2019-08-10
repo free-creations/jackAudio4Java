@@ -38,22 +38,22 @@ struct _jfieldID {
 
 
 /**
- * When the `value` field of the Int container cannot be accessed, pushValue shall throw Fatal Exception into the JVM.
+ * When the no fieldID can be found, 'initialiseRefs' shall throw a Fatal Exception into the JVM.
  */
-    TEST(types_Int, pushValue_initialiseRefs) {
-        NiceMock<JNIEnvMock> jniEnvMock;
-        _jclass clazz;
+TEST(types_Int, initialiseRefs_badField) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jclass clazz;
 
-        // Make the jniEnvMock.GetFieldID return a null address
-        ON_CALL(jniEnvMock, GetFieldID(_, _, _))
-                .WillByDefault(Return(nullptr));
+    // Make the jniEnvMock.GetFieldID return a null address. That is "fieldID not found".
+    ON_CALL(jniEnvMock, GetFieldID(_, _, _))
+            .WillByDefault(Return(nullptr));
 
-        // so we expect fatal error to be thrown
-        EXPECT_CALL(jniEnvMock, FatalError(_))
-                .Times(1);
+    // so we expect fatal error to be thrown
+    EXPECT_CALL(jniEnvMock, FatalError(_))
+            .Times(1);
 
-        Java_jackAudio4Java_types_Int_initialiseRefs(&jniEnvMock, &clazz);
-    }
+    types::Int::initialiseRefs(&jniEnvMock, &clazz);
+}
 /**
  * When the container can be accessed, pushValue shall set the field through a call to env.SetIntField
  *

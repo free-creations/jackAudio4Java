@@ -23,11 +23,10 @@
 namespace types {
     class _jIntObject : public _jobject {
     };
-
     typedef _jIntObject *jIntObject;
 
     namespace Int {
-        void initialiseRefs(JNIEnv *env, jclass clazz);
+        void inline initialiseRefs(JNIEnv *env, jclass clazz){Java_jackAudio4Java_types_Int_initialiseRefs(env, clazz);}
         void setValue(JNIEnv *env, jIntObject IntContainer, jint value);
     }
 }
