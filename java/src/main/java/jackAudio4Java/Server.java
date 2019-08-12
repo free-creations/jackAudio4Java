@@ -16,7 +16,6 @@
 package jackAudio4Java;
 
 import jackAudio4Java.types.Int;
-import org.apache.commons.lang3.Validate;
 
 public class Server {
   /**
@@ -32,10 +31,6 @@ public class Server {
       Int minorRef,
       Int microRef,
       Int protoRef) {
-    Validate.notNull(majorRef, "majorRef shall not be null");
-    Validate.notNull(minorRef, "minorRef shall not be null");
-    Validate.notNull(microRef, "microRef shall not be null");
-    Validate.notNull(protoRef, "protoRef shall not be null");
     _jack_get_version(majorRef, minorRef, microRef, protoRef);
   }
 

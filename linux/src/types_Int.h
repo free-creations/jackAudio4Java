@@ -19,16 +19,33 @@
 #pragma once
 
 #include "jni_headers/jackAudio4Java_types_Int.h"
+#include <atomic>
 
 namespace types {
+    /**
+     * A pseudo class that stands for the Java class `jackAudio4Java.types.Int`.
+     */
     class _jIntObject : public _jobject {
     };
+
+    /**
+     * A JNI reference to a Java object of class `jackAudio4Java.types.Int`.
+     */
     typedef _jIntObject *jIntObject;
 
-    namespace Int {
-        void inline initialiseRefs(JNIEnv *env, jclass clazz){Java_jackAudio4Java_types_Int_initialiseRefs(env, clazz);}
-        void setValue(JNIEnv *env, jIntObject IntContainer, jint value);
-    }
+    /**
+     * The `Int` class encapsulates the native part of the Java class `jackAudio4Java.types.Int`.
+     */
+    class Int {
+    public:
+        static std::atomic<jfieldID> value_ID;
+
+        static void inline registerIDs(JNIEnv *env, jclass clazz) {
+            Java_jackAudio4Java_types_Int_registerIDs(env, clazz);
+        }
+
+        static void setValue(JNIEnv *env, jIntObject IntContainer, jint value);
+    };
 }
 
 

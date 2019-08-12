@@ -32,27 +32,24 @@
 /*
  * This namespace implements the native functions of the Java class `jackAudio4Java.types.Int`.
  */
-namespace types{
-    namespace Int {
-        /**
-         * The cached field ID of the Java field `jackAudio4Java_types_Int.value`.
-         *
-         * Note: the IDs returned for a given class don't change for the lifetime of the JVM process.
-         * Thus we do not have to worry about race conditions or different environments having different classIDs.
-         */
-         static jfieldID value_ID = nullptr;
+namespace types {
 
+    /**
+     * The cached field ID of the Java field `jackAudio4Java_types_Int.value`.
+     *
+     * Note: the IDs returned for a given class don't change for the lifetime of the JVM process.
+     * Thus we do not have to worry about race conditions or different environments having different classIDs.
+     */
+    std::atomic<jfieldID> Int::value_ID;
 
-        /**
-        * Sets the `value` field.
-        * @param env pointer to the JNI environment.
-        * @param IntContainer JNI- reference to the Int container object.
-        * @param value the new value.
-        */
-        void setValue(JNIEnv *env, jIntObject IntContainer, jint value) {
-            env->SetIntField(IntContainer, value_ID, value);
-        }
-
+    /**
+    * Sets the `value` field.
+    * @param env pointer to the JNI environment.
+    * @param IntContainer JNI- reference to the Int container object.
+    * @param value the new value.
+    */
+    void Int::setValue(JNIEnv *env, jIntObject IntContainer, jint value) {
+        if (IntContainer) env->SetIntField(IntContainer, value_ID, value);
     }
 }
 
@@ -63,7 +60,7 @@ namespace types{
  * @param env pointer to the JNI environment.
  * @param clazz JNI reference to the Java- class of the Int container.
  */
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_initialiseRefs(JNIEnv *env, jclass clazz){
+JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_registerIDs(JNIEnv *env, jclass clazz) {
     // cache field IDs.
     // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
     types::Int::value_ID = env->GetFieldID(clazz, "value", "I");

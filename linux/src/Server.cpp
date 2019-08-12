@@ -52,10 +52,10 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
     int microVal = 3;
     int protoVal = 4;
 
-    types::Int::setValue(env, (types::jIntObject) majorRef, majorVal);
-    types::Int::setValue(env, (types::jIntObject) minorRef, minorVal);
-    types::Int::setValue(env, (types::jIntObject) microRef, microVal);
-    types::Int::setValue(env, (types::jIntObject) protoRef, protoVal);
+    if (majorRef) types::Int::setValue(env, (types::jIntObject) majorRef, majorVal);
+    if (minorRef) types::Int::setValue(env, (types::jIntObject) minorRef, minorVal);
+    if (microRef) types::Int::setValue(env, (types::jIntObject) microRef, microVal);
+    if (protoRef) types::Int::setValue(env, (types::jIntObject) protoRef, protoVal);
 }
 
 /**

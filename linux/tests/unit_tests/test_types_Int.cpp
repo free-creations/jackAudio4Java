@@ -25,11 +25,14 @@
 
 using testing::Return;
 using testing::StrEq;
-using ::testing::_;
+using testing::_;
+using testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
+
 using namespace jnimock;
 using namespace types;
-using namespace types::Int;
-using ::testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
+
+
+
 
 struct _jfieldID {
 }; // jni.h only defines a forward reference. So we complete the definition with an empty struct here. Thus we will be
@@ -40,11 +43,11 @@ struct _jfieldID {
 /**
  * When the no fieldID can be found, 'initialiseRefs' shall throw a Fatal Exception into the JVM.
  */
-TEST(types_Int, initialiseRefs_badField) {
+TEST(types_Int, registerIDs_badField) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jclass clazz;
 
-    // Make the jniEnvMock.GetFieldID return a null address. That is "fieldID not found".
+    // Make the jniEnvMock.GetFieldID return a null address. That means "fieldID not found".
     ON_CALL(jniEnvMock, GetFieldID(_, _, _))
             .WillByDefault(Return(nullptr));
 
@@ -52,30 +55,42 @@ TEST(types_Int, initialiseRefs_badField) {
     EXPECT_CALL(jniEnvMock, FatalError(_))
             .Times(1);
 
-    types::Int::initialiseRefs(&jniEnvMock, &clazz);
+    // and here we go...
+    Int::registerIDs(&jniEnvMock, &clazz);
 }
+
 /**
- * When the container can be accessed, pushValue shall set the field through a call to env.SetIntField
- *
-TEST(UtilInt, pushValue_success) {
-    NiceMock<JNIEnvMock> jniEnvMock; // NiceMock avoids "Uninteresting mock function call" warnings.
-    _jobject container;
-    _jfieldID fid;
+ * When the `fieldID` is OK, we expect `registerIDs` to store this `fieldID` into `types::Int::value_ID`
+ */
+TEST(types_Int, registerIDs) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jfieldID fieldID;
     _jclass clazz;
-    jint value = 4711;
 
-    // make the jniEnvMock behave as if class and field were OK.
-    ON_CALL(jniEnvMock, GetObjectClass(&container))
-            .WillByDefault(Return(&clazz));
-    ON_CALL(jniEnvMock, GetFieldID(&clazz, StrEq("value"), StrEq("I")))
-            .WillByDefault(Return(&fid));
+    // Make the jniEnvMock.GetFieldID return the address of fieldID
+    ON_CALL(jniEnvMock, GetFieldID(_, _, _))
+            .WillByDefault(Return(&fieldID));
 
-    // check that the value is really pushed...
-    EXPECT_CALL(jniEnvMock, SetIntField(&container, &fid, value))
+    // here we go
+    Int::registerIDs(&jniEnvMock, &clazz);
+
+    // we expect that  `types::Int::value_ID` is now set to `&fieldID`
+    EXPECT_EQ(&fieldID, Int::value_ID);
+}
+
+/**
+ * setValue shall push a new value into the value field.
+ */
+TEST(types_Int, setValue) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jIntObject intObject;
+    jint newValue = 4711;
+
+    // we expect the new value to be pushed onto the Int objects `value` field
+    EXPECT_CALL(jniEnvMock, SetIntField(&intObject, _, newValue))
             .Times(1);
 
-    Int::pushValue(&jniEnvMock, value, &container);
+    // here we go
+    Int::setValue(&jniEnvMock, &intObject, newValue);
 }
-
-*/
 

@@ -22,15 +22,15 @@ package jackAudio4Java.types;
  */
 public class Int {
   /**
-   * The native class initializer shall cache fieldIDs and functionsIDs, for later use in C++.
-   * This follows the recommendations given by IBM here:
-   * https://www.ibm.com/developerworks/library/j-jni/index.html#notc
+   * Registers JNI specific identities.
    **/
-  private static native void initialiseRefs();
-
+  private static native void registerIDs();
   static {
-    initialiseRefs();
+    registerIDs();
   }
 
+  /**
+   * The value of this container.
+   */
   public int value;
 }
