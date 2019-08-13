@@ -22,7 +22,9 @@
  *
  */
 #include <jni.h>
+#include <jack/jack.h>
 #include "Server.h"
+
 
 
 
@@ -46,11 +48,13 @@ using namespace std;
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
         (JNIEnv *env, jclass, jobject majorRef, jobject minorRef, jobject microRef, jobject protoRef) {
-    // @Todo replace these assignments by a call to JACK
-    int majorVal = 1;
-    int minorVal = 9;
-    int microVal = 11;
-    int protoVal = 2;
+
+    int majorVal = -1;
+    int minorVal = -1;
+    int microVal = -1;
+    int protoVal = -1;
+
+    jack_get_version(&majorVal, &minorVal, &microVal, &protoVal);
 
     if (majorRef) types::Int::setValue(env, (types::jIntObject) majorRef, majorVal);
     if (minorRef) types::Int::setValue(env, (types::jIntObject) minorRef, minorVal);
