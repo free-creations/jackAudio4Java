@@ -35,19 +35,21 @@ using namespace types;
 
 
 struct _jfieldID {
-}; // jni.h only defines a forward reference. So we complete the definition with an empty struct here. Thus we will be
-// able to create empty objects of type _jfieldID.
+    // jni.h only defines a forward reference.
+    // We complete the definition with an empty struct here.
+    // This will enable us to create empty objects of type _jfieldID.
+};
 
 
 
 /**
- * When the no fieldID can be found, 'initialiseRefs' shall throw a Fatal Exception into the JVM.
+ * When the no fieldID can be found, 'registerIDs' shall throw a Fatal Exception into the JVM.
  */
 TEST(types_Int, registerIDs_badField) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jclass clazz;
 
-    // Make the jniEnvMock.GetFieldID return a null address. That means "fieldID not found".
+    // Make the `jniEnvMock.GetFieldID` return a null address. That means "fieldID not found".
     ON_CALL(jniEnvMock, GetFieldID(_, _, _))
             .WillByDefault(Return(nullptr));
 
@@ -79,14 +81,14 @@ TEST(types_Int, registerIDs) {
 }
 
 /**
- * setValue shall push a new value into the value field.
+ * Function `setValue` shall push a new value into the `value` field of the `Int` object.
  */
 TEST(types_Int, setValue) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jIntObject intObject;
     jint newValue = 4711;
 
-    // we expect the new value to be pushed onto the Int objects `value` field
+    // we expect the new value to be pushed onto the Int objects `value` field.
     EXPECT_CALL(jniEnvMock, SetIntField(&intObject, _, newValue))
             .Times(1);
 

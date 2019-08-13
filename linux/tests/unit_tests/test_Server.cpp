@@ -26,19 +26,38 @@
 using testing::Return;
 using testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
 using testing::_;
+using testing::Ge;
+
+
 using namespace jnimock;
 
-
+/**
+ * Function `Server::jack_get_version` shall push the _jack library_ version into the
+ * `Int` objects provided by the caller.
+ */
 TEST(Server, jack_get_version) {
-
     NiceMock<JNIEnvMock> jniEnvMock;
+    types::_jIntObject major;
+    types::_jIntObject minor;
+    types::_jIntObject micro;
+    types::_jIntObject proto;
 
-    jobject major_ptr = nullptr;
-    jobject minor_ptr = nullptr;
-    jobject micro_ptr = nullptr;
-    jobject proto_ptr = nullptr;
 
-    Java_jackAudio4Java_Server__1jack_1get_1version(&jniEnvMock, nullptr, major_ptr, minor_ptr, micro_ptr, proto_ptr);
+    // major version greater or equal to 1
+    EXPECT_CALL(jniEnvMock, SetIntField(&major, _, Ge(1)))
+            .Times(1);
+    // minor version not negative
+    EXPECT_CALL(jniEnvMock, SetIntField(&minor, _, Ge(0)))
+            .Times(1);
+    // micro version not negative
+    EXPECT_CALL(jniEnvMock, SetIntField(&micro, _, Ge(0)))
+            .Times(1);
+    // protocol version not negative
+    EXPECT_CALL(jniEnvMock, SetIntField(&proto, _, Ge(0)))
+            .Times(1);
+
+    // here we go...
+    Server::jack_get_version(&jniEnvMock, &major, &minor, &micro, &proto);
 
 }
 /**
@@ -53,7 +72,7 @@ TEST(Server, jni_get_version) {
     ON_CALL(jniEnvMock, GetVersion())
             .WillByDefault(Return(JNI_VERSION_1_6));
 
-    // verify what Java_jackAudio4Java_Server__1jni_1get_1version returns as version.
-    jint version = Java_jackAudio4Java_Server__1jni_1get_1version(&jniEnvMock, clazz);
+    // here we go...
+    jint version = Server::jni_get_version(&jniEnvMock);
     EXPECT_EQ(version, JNI_VERSION_1_6);
 }

@@ -19,4 +19,30 @@
 #pragma once
 
 #include "jni_headers/jackAudio4Java_Server.h"
+#include "types_Int.h"
 
+
+/**
+ * The `Server` class encapsulates the native part of the Java class `jackAudio4Java.Server`.
+ *
+ * The javah names like `Java_jackAudio4Java_Server__1jni_1get_1version` are aliased to
+ * more intelligible names like `Server::jni_get_version`.
+ *
+ */
+class Server {
+public:
+
+    static void inline
+    jack_get_version(JNIEnv *env,
+                     types::jIntObject majorRef,
+                     types::jIntObject minorRef,
+                     types::jIntObject microRef,
+                     types::jIntObject protoRef) {
+        Java_jackAudio4Java_Server__1jack_1get_1version(env, nullptr, majorRef, minorRef, microRef, protoRef);
+    }
+
+    static jint inline
+    jni_get_version(JNIEnv *env) {
+        return Java_jackAudio4Java_Server__1jni_1get_1version(env, nullptr);
+    }
+};

@@ -35,6 +35,10 @@ namespace types {
 
     /**
      * The `Int` class encapsulates the native part of the Java class `jackAudio4Java.types.Int`.
+     *
+     * The javah names like `Java_jackAudio4Java_types_Int_registerIDs` are aliased to
+     * more intelligible names like `Int::registerIDs`.
+     *
      */
     class Int {
     public:
