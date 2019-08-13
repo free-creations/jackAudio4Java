@@ -25,8 +25,17 @@ public class Int {
    * Registers JNI specific identities.
    **/
   private static native void registerIDs();
+
   static {
     registerIDs();
+  }
+
+  public Int() {
+    this(0);
+  }
+
+  public Int(int v) {
+    value = v;
   }
 
   /**

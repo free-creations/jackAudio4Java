@@ -17,9 +17,10 @@ dependencies {
 }
 
 compileJava {
-  // @todo: when gradle is called from the "java" sub-project, the header files are written to the wrong location.
+  // JNI headers to be written to ../linux/src/jni_headers
   options.compilerArgs += ["-h", file("../linux/src/jni_headers")]
 }
+
 /*
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
