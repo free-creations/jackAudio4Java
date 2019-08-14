@@ -18,7 +18,9 @@
 #
 #============================================================================
 cmake_minimum_required(VERSION 3.14)
+
 project(jackAudio4Java)
+set(VERSION "0.0-SNAPSHOT")
 
 # we need the header files for the Jack library
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -27,10 +29,8 @@ find_package(JACK REQUIRED)
 # we need the header files of the Java Development Kit.
 find_package(JNI REQUIRED)
 
-set(VERSION "0.0.0")
-
 # The library name shall be be the downcased project-name with "_lib" and version appended.
-string( TOLOWER ${CMAKE_PROJECT_NAME}_lib_${VERSION} LIB_NAME )
+string( TOLOWER ${CMAKE_PROJECT_NAME}_${VERSION} LIB_NAME )
 
 set(CMAKE_CXX_STANDARD 17)
 

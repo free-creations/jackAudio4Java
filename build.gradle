@@ -15,5 +15,11 @@
  */
 
 
-group 'de.free-creations'
-version '1.0-SNAPSHOT'
+
+
+allprojects {
+
+  // configure the group and version for this project
+  group 'de.free-creations'
+  version '0.0-SNAPSHOT'
+}

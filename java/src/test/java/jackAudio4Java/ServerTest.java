@@ -9,11 +9,13 @@ import static org.junit.Assert.*;
 public class ServerTest {
   @Before
   public void setUp() {
-    // @ToDo remove hardcoded library name
-    System.load("/home/harald/workspace/jackAudio4Java/linux/cmake-build-debug/src/libjackaudio4java_lib_0.0.0.so");
+    System.load(System.getProperty("jackAudio4java.library"));
   }
 
 
+  /**
+   * The function Server.jack_get_version shall return the version of the jack library.
+   */
   @Test
   public void jack_get_version() {
     Int major_ptr = new Int(-1);
@@ -27,6 +29,21 @@ public class ServerTest {
     assertTrue(minor_ptr.value >= 0);
     assertTrue(micro_ptr.value >= 0);
     assertTrue(proto_ptr.value >= 0);
+  }
+
+  /**
+   * The function Server.jack_get_version shall not crash if instead of a Int container a
+   * null pointer is given.
+   */
+  @Test
+  public void jack_get_version_null_ptr() {
+    Int major_ptr = new Int(-1);
+    Int minor_ptr = new Int(-1);
+
+    Server.jack_get_version(major_ptr, minor_ptr, null, null);
+
+    assertTrue(major_ptr.value >= 0);
+    assertTrue(minor_ptr.value >= 0);
   }
 
   @Test
