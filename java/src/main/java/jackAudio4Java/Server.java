@@ -15,11 +15,54 @@
  */
 package jackAudio4Java;
 
+import com.shankyank.jniloader.JNILoader;
 import jackAudio4Java.types.Int;
 
+import java.io.IOException;
+
 public class Server {
+
+  private static final String libraryName = "jackaudio4java_0.0-snapshot";
+  private static final Object initializeLock = new Object();
+
+  public enum State {
+    UNINITIALIZED,
+    OK,
+    CRASHED
+  }
+
+  private static State initializationState = State.UNINITIALIZED;
+
+  public static State getInitializationState() {
+    synchronized (initializeLock) {
+      return initializationState;
+    }
+  }
+
+
   /**
-   * Call this function to get the version of the JACK-server in form of several numbers.
+   * Initialize the system by loading the necessary __native libraries__ from the resource bundle.
+   *
+   * @throws IOException When no Library matching the Operating System and processor architecture
+   * of the the runtime platform could be found.
+   */
+  public static void initialize() throws IOException {
+    synchronized (initializeLock) {
+      // already initialized? Then just return.
+      if (initializationState == State.OK) return;
+
+      // Lets try to initialise. A crash might happen.
+      initializationState = State.CRASHED;
+      JNILoader loader = new JNILoader();
+      loader.extractLibs("/native", libraryName);
+      System.loadLibrary(libraryName);
+      // OK it worked...
+      initializationState = State.OK;
+    }
+  }
+
+  /**
+   * Get the version of the JACK-server in form of several numbers.
    *
    * @param majorRef Integer- container receiving major version of JACK.
    * @param minorRef Integer- container receiving minor version of JACK.
@@ -41,21 +84,19 @@ public class Server {
       Int protoRef);
 
   /**
-   * Call this function to get the version of the native Java-method interface.
-   * <p>
+   * Get the version of the native Java-method interface.
+   *
    * The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
-   * </p><p>
+   *
    * At the time of writing, the following constants were defined:
-   * </p>
-   * <p><ul>
-   * <li> JNI_VERSION_1_1 0x00010001
-   * <li> JNI_VERSION_1_2 0x00010002
-   * <li> JNI_VERSION_1_4 0x00010004
-   * <li> JNI_VERSION_1_6 0x00010006
-   * <li> JNI_VERSION_1_8 0x00010008
-   * <li> JNI_VERSION_9   0x00090000
-   * <li> JNI_VERSION_10  0x000a0000
-   * </ul></p>
+   *
+   * - `JNI_VERSION_1_1 0x00010001`
+   * - `JNI_VERSION_1_2 0x00010002`
+   * - `JNI_VERSION_1_4 0x00010004`
+   * - `JNI_VERSION_1_6 0x00010006`
+   * - `JNI_VERSION_1_8 0x00010008`
+   * - `JNI_VERSION_9   0x00090000`
+   * - `JNI_VERSION_10  0x000a0000`
    *
    * @return the version of the Java-Native-Interface
    * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">

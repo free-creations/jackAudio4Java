@@ -22,18 +22,19 @@ cmake_minimum_required(VERSION 3.14)
 project(jackAudio4Java)
 set(VERSION "0.0-SNAPSHOT")
 
-# we need the header files for the Jack library
+# enable the custom module "FindJACK.cmake"
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+# we need the "JACK-developement" package to be installed on the  build platform
+# in order to have the "jack.h" headers and the jack library to link to.
 find_package(JACK REQUIRED)
 
-# we need the header files of the Java Development Kit.
+# further we need the header files of the Java Development Kit.
 find_package(JNI REQUIRED)
 
-# The library name shall be be the downcased project-name with "_lib" and version appended.
+# The library name shall be be the downcased project-name with version appended.
 string( TOLOWER ${CMAKE_PROJECT_NAME}_${VERSION} LIB_NAME )
 
 set(CMAKE_CXX_STANDARD 17)
-
 
 add_subdirectory(src)
 add_subdirectory(tests)

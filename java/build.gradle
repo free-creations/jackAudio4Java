@@ -1,9 +1,20 @@
 import java.text.SimpleDateFormat
+/*
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'ch.raffael.markdown-doclet:markdown-doclet:1.4'
+  }
+}
+*/
 
 plugins {
   id 'java-library'
   id 'net.nemerosa.versioning' version '2.6.1'
 }
+// apply plugin: 'ch.raffael.markdown-doclet'
 
 sourceCompatibility = 1.8
 
@@ -11,11 +22,19 @@ repositories {
   mavenCentral()
 }
 
+
+
+
+
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.12'
 
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   //compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+  // https://mvnrepository.com/artifact/com.shankyank.jni/jni-loader
+  implementation group: 'com.shankyank.jni', name: 'jni-loader', version: '0.1'
+  // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
+  implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.28'
 
 }
 
@@ -36,7 +55,7 @@ clean {
 
 test {
   // set system properties for the test JVM(s)
-  systemProperty 'jackAudio4java.library', file('../linux/build-debug/src/libjackaudio4java_0.0-snapshot.so')
+  //systemProperty 'jackAudio4java.library', file('../linux/build-debug/src/libjackaudio4java_0.0-snapshot.so')
 
   // set JVM arguments for the test JVM(s)
   //jvmArgs "-verbose:jni", "-ea"
@@ -51,12 +70,12 @@ jar {
   manifest {
     attributes(
         'Implementation-Version': rootProject.version,
-        'Built-By'       : System.properties['user.name'],
+        'Built-By': System.properties['user.name'],
         'Build-Timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-        'Build-Revision' : versioning.info.commit,
-        'Created-By'     : "Gradle ${gradle.gradleVersion}",
-        'Build-Jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-        'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+        'Build-Revision': versioning.info.commit,
+        'Created-By': "Gradle ${gradle.gradleVersion}",
+        'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+        'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
     )
   }
 }

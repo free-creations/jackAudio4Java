@@ -4,3 +4,5 @@
 # Ignore Gradle build output directory
 build
 /src/main/java/jackAudio4Java/jack.h
+# Ignore binary native (should be rebuild on verey delivery).
+/src/main/resources/native/

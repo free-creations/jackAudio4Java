@@ -2,16 +2,17 @@ package jackAudio4Java;
 
 import jackAudio4Java.types.Int;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class ServerTest {
-  @Before
-  public void setUp() {
-    System.load(System.getProperty("jackAudio4java.library"));
-  }
 
+  @BeforeClass
+  public static void setUpBeforeClass() throws Exception {
+    Server.initialize();
+  }
 
   /**
    * The function Server.jack_get_version shall return the version of the jack library.
