@@ -1,20 +1,13 @@
 import java.text.SimpleDateFormat
-/*
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'ch.raffael.markdown-doclet:markdown-doclet:1.4'
-  }
-}
-*/
 
 plugins {
   id 'java-library'
   id 'net.nemerosa.versioning' version '2.6.1'
+
+  // `mdoclet` is a Doclet that allows the use of Markdown in JavaDoc.
+  // https://github.com/mnlipp/jdrupes-mdoclet
+  id 'org.jdrupes.mdoclet' version '1.0.5'
 }
-// apply plugin: 'ch.raffael.markdown-doclet'
 
 sourceCompatibility = 1.8
 
