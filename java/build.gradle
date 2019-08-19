@@ -156,10 +156,6 @@ publishing {
   }
 
   repositories {
-    maven {
-      name = 'myRepo'
-      url = "file://${buildDir}/testRepo"
-    }
 
     maven {
       name = 'snapshots'
