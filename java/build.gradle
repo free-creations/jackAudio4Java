@@ -109,7 +109,7 @@ artifacts {
 
 publishing {
   publications {
-    mavenJava(MavenPublication) {
+    maven(MavenPublication) {
       from components.java
 
       artifactId = rootProject.name
@@ -150,7 +150,6 @@ publishing {
           system = 'GitHub'
           url = 'https://github.com/free-creations/jackAudio4Java/issues'
         }
-
       }
 
     }
@@ -164,7 +163,7 @@ publishing {
 
     maven {
       name = 'snapshots'
-      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+      url 'https://oss.sonatype.org/content/repositories/snapshots'
       credentials {
         username sonatypeUsername
         password sonatypePassword
@@ -172,3 +171,11 @@ publishing {
     }
   }
 }
+
+
+
+signing {
+  sign publishing.publications.maven
+}
+
+
