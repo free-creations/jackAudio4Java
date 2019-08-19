@@ -2,9 +2,22 @@ import java.text.SimpleDateFormat
 
 plugins {
   id 'java-library'
+
+  //Performs quality checks on the project's Java source files using
+  // SpotBugs (former FindBugs) and generates reports from these checks
+  id 'com.github.spotbugs' version '2.0.0'
+
+  // Plug-in that computes version information from the SCM.
   id 'net.nemerosa.versioning' version '2.6.1'
 
-  // `mdoclet` is a Doclet that allows the use of Markdown in JavaDoc.
+  // The Maven Publish Plugin provides the ability to publish build
+  // artifacts to an Apache Maven repository.
+  id 'maven-publish'
+
+  //The Signing Plugin adds the ability to digitally sign built files and artifacts.
+  id 'signing'
+
+  // The `mdoclet` is a Doclet that allows the use of Markdown in JavaDoc.
   // https://github.com/mnlipp/jdrupes-mdoclet
   id 'org.jdrupes.mdoclet' version '1.0.5'
 }
@@ -16,20 +29,24 @@ repositories {
 }
 
 versioning {
+  // Suppress some warnings from the nemerosa-versioning plugin.
   noWarningOnDirty = true
 }
 
 
-
 dependencies {
-  testCompile group: 'junit', name: 'junit', version: '4.12'
+  testImplementation group: 'junit', name: 'junit', version: '4.12'
+  testImplementation group: 'com.google.truth' ,name: 'truth', version: '1.0'
+  testImplementation group: 'com.google.truth.extensions' ,name: 'truth-java8-extension', version: '1.0'
 
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   //compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
   // https://mvnrepository.com/artifact/com.shankyank.jni/jni-loader
-  implementation group: 'com.shankyank.jni', name: 'jni-loader', version: '0.1'
+  implementation group: 'com.shankyank.jni', name: 'jni-loader', version: '0.1' // @Todo replace
   // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
-  implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.28'
+  implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.28' // @Todo remove
+
+
 
 }
 
@@ -49,9 +66,6 @@ clean {
 }
 
 test {
-  // set system properties for the test JVM(s)
-  //systemProperty 'jackAudio4java.library', file('../linux/build-debug/src/libjackaudio4java_0.0-snapshot.so')
-
   // set JVM arguments for the test JVM(s)
   //jvmArgs "-verbose:jni", "-ea"
 }
@@ -65,7 +79,7 @@ jar {
   manifest {
     attributes(
         'Implementation-Version': rootProject.version,
-        'Git-Version' : versioning.info.full,
+        'Git-Version': versioning.info.full,
         'Built-By': System.properties['user.name'],
         'Build-Timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
         'Build-Revision': versioning.info.commit,
@@ -73,5 +87,71 @@ jar {
         'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
         'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
     )
+  }
+}
+
+task sourceJar(type: Jar) {
+  classifier "sources"
+  from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier "javadoc"
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives jar
+  archives sourceJar
+  archives javadocJar
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifactId = rootProject.name
+      pom {
+        name = "${project.group}:${rootProject.name}"
+        description = 'A thin JNI wrapper around the JACK-audio library on Linux.'
+        url = 'https://free-creations.de/jackAudio4Java'
+        licenses {
+          license {
+            name = 'The Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+        developers {
+          developer {
+            id = 'harald-LB'
+            name = 'Harald Postner'
+            email = 'Harald@free-creations.de'
+            url = 'https://www.free-creations.de/'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:https://github.com/free-creations/jackAudio4Java.git'
+          developerConnection = 'scm:git:ssh://github.com/free-creations/jackAudio4Java.git'
+          url = 'https://github.com/free-creations/jackAudio4Java'
+        }
+        issueManagement {
+          system = 'GitHub'
+          url = 'https://github.com/free-creations/jackAudio4Java/issues'
+        }
+
+      }
+      from components.java
+    }
+  }
+
+  repositories {
+    maven {
+      name = 'myRepo'
+      url = "file://${buildDir}/testRepo"
+    }
+    maven {
+      name = 'myOtherRepo'
+      url = "file://${buildDir}/otherTestRepo"
+    }
   }
 }
