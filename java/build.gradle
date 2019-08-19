@@ -18,6 +18,7 @@ plugins {
   id 'signing'
 
   // The `mdoclet` is a Doclet that allows the use of Markdown in JavaDoc.
+  // note: `mdoclet` seems not to work with Java 11
   // https://github.com/mnlipp/jdrupes-mdoclet
   id 'org.jdrupes.mdoclet' version '1.0.5'
 }
@@ -35,9 +36,6 @@ versioning {
 
 
 dependencies {
-  testImplementation group: 'junit', name: 'junit', version: '4.12'
-  testImplementation group: 'com.google.truth' ,name: 'truth', version: '1.0'
-  testImplementation group: 'com.google.truth.extensions' ,name: 'truth-java8-extension', version: '1.0'
 
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   //compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
@@ -46,6 +44,9 @@ dependencies {
   // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
   implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.28' // @Todo remove
 
+  testImplementation group: 'junit', name: 'junit', version: '4.12'
+  testImplementation group: 'com.google.truth' ,name: 'truth', version: '1.0'
+  testImplementation group: 'com.google.truth.extensions' ,name: 'truth-java8-extension', version: '1.0'
 
 
 }
@@ -108,8 +109,19 @@ artifacts {
 
 publishing {
   publications {
-    maven(MavenPublication) {
+    mavenJava(MavenPublication) {
+      from components.java
+
       artifactId = rootProject.name
+      version =  rootProject.version
+
+      artifact(sourceJar) {
+        classifier = 'sources'
+      }
+      artifact(javadocJar) {
+        classifier = 'javadoc'
+      }
+
       pom {
         name = "${project.group}:${rootProject.name}"
         description = 'A thin JNI wrapper around the JACK-audio library on Linux.'
@@ -140,7 +152,7 @@ publishing {
         }
 
       }
-      from components.java
+
     }
   }
 
@@ -149,9 +161,14 @@ publishing {
       name = 'myRepo'
       url = "file://${buildDir}/testRepo"
     }
+
     maven {
-      name = 'myOtherRepo'
-      url = "file://${buildDir}/otherTestRepo"
+      name = 'snapshots'
+      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+      credentials {
+        username sonatypeUsername
+        password sonatypePassword
+      }
     }
   }
 }
