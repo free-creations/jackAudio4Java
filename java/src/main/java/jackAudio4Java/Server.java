@@ -15,28 +15,32 @@
  */
 package jackAudio4Java;
 
-import com.shankyank.jniloader.JNILoader;
 import jackAudio4Java.types.Int;
 
 import java.io.IOException;
 
+/**
+ * @Todo rename to Jack
+ */
 public class Server {
 
-  private static final String libraryName = "jackaudio4java_0.0-snapshot";
-  private static final Object initializeLock = new Object();
+  private static volatile Server instance;
+  private static final Object creationLock = new Object();
 
-  public enum State {
-    UNINITIALIZED,
-    OK,
-    CRASHED
+  private Server() {
+    NativeManager.checkNative();
   }
 
-  private static State initializationState = State.UNINITIALIZED;
-
-  public static State getInitializationState() {
-    synchronized (initializeLock) {
-      return initializationState;
+  public static Server server() {
+    Server result = instance;
+    if (result == null) {
+      synchronized (creationLock) {
+        result = instance;
+        if (result == null)
+          instance = result = new Server();
+      }
     }
+    return result;
   }
 
 
@@ -46,19 +50,8 @@ public class Server {
    * @throws IOException When no Library matching the Operating System and processor architecture
    * of the the runtime platform could be found.
    */
-  public static void initialize() throws IOException {
-    synchronized (initializeLock) {
-      // already initialized? Then just return.
-      if (initializationState == State.OK) return;
+  private static void initialize() throws IOException {
 
-      // Lets try to initialise. A crash might happen.
-      initializationState = State.CRASHED;
-      JNILoader loader = new JNILoader();
-      loader.extractLibs("/native", libraryName);
-      System.loadLibrary(libraryName);
-      // OK it worked...
-      initializationState = State.OK;
-    }
   }
 
   /**
@@ -69,7 +62,7 @@ public class Server {
    * @param microRef Integer- container receiving micro version of JACK.
    * @param protoRef Integer- container receiving protocol version of JACK.
    */
-  public static void jack_get_version(
+  public void jack_get_version(
       Int majorRef,
       Int minorRef,
       Int microRef,
@@ -102,7 +95,7 @@ public class Server {
    * @see <a href="https://docs.oracle.com/en/java/javase/12/docs/specs/jni/functions.html#version-constants">
    * Java Native Interface Specification</a>
    */
-  public static int jni_get_version() {
+  public int jni_get_version() {
     return _jni_get_version();
   }
 

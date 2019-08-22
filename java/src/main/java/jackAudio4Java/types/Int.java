@@ -15,6 +15,8 @@
  */
 package jackAudio4Java.types;
 
+import jackAudio4Java.NativeManager;
+
 /**
  * Container of an Integer value.
  * Permits to pass integers by reference, as is often used in C programming.
@@ -27,6 +29,7 @@ public class Int {
   private static native void registerIDs();
 
   static {
+    NativeManager.checkNative();
     registerIDs();
   }
 

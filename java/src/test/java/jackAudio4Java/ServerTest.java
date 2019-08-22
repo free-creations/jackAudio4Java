@@ -1,17 +1,12 @@
 package jackAudio4Java;
 
 import jackAudio4Java.types.Int;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 public class ServerTest {
 
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-    Server.initialize();
-  }
 
   /**
    * The function Server.jack_get_version shall return the version of the jack library.
@@ -23,7 +18,7 @@ public class ServerTest {
     Int micro_ptr = new Int(-1);
     Int proto_ptr = new Int(-1);
 
-    Server.jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
+    Server.server().jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
 
     assertTrue(major_ptr.value >= 0);
     assertTrue(minor_ptr.value >= 0);
@@ -32,15 +27,15 @@ public class ServerTest {
   }
 
   /**
-   * The function Server.jack_get_version shall not crash if instead of a Int container a
-   * null pointer is given.
+   * The function Server.jack_get_version shall not crash if, instead of an Int container,
+   * a `null` pointer is given.
    */
   @Test
   public void jack_get_version_null_ptr() {
     Int major_ptr = new Int(-1);
     Int minor_ptr = new Int(-1);
 
-    Server.jack_get_version(major_ptr, minor_ptr, null, null);
+    Server.server().jack_get_version(major_ptr, minor_ptr, null, null);
 
     assertTrue(major_ptr.value >= 0);
     assertTrue(minor_ptr.value >= 0);
@@ -48,7 +43,7 @@ public class ServerTest {
 
   @Test
   public void jni_get_version() {
-    int version = Server.jni_get_version();
+    int version = Server.server().jni_get_version();
     assertTrue(version >= 0);
   }
 }
