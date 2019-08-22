@@ -20,7 +20,6 @@ import jackAudio4Java.types.Int;
 import java.io.IOException;
 
 /**
- * @Todo rename to Jack
  */
 public class Jack {
 
