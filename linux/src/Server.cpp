@@ -46,7 +46,7 @@ using namespace std;
  * @param microRef Integer- container receiving micro version of JACK.
  * @param protoRef Integer- container receiving protocol version of JACK.
  */
-JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
+JNIEXPORT void JNICALL Java_jackAudio4Java_Jack__1jack_1get_1version
         (JNIEnv *env, jclass, jobject majorRef, jobject minorRef, jobject microRef, jobject protoRef) {
 
     int majorVal = -1;
@@ -81,7 +81,7 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Server__1jack_1get_1version
  *   Java Native Interface Specification</a>
  * @return the version of the Java-Native-Interface
  */
-JNIEXPORT jint JNICALL Java_jackAudio4Java_Server__1jni_1get_1version
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack__1jni_1get_1version
         (JNIEnv *env, jclass) {
     return env->GetVersion();
 }

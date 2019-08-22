@@ -22,22 +22,22 @@ import java.io.IOException;
 /**
  * @Todo rename to Jack
  */
-public class Server {
+public class Jack {
 
-  private static volatile Server instance;
+  private static volatile Jack instance;
   private static final Object creationLock = new Object();
 
-  private Server() {
+  private Jack() {
     NativeManager.checkNative();
   }
 
-  public static Server server() {
-    Server result = instance;
+  public static Jack server() {
+    Jack result = instance;
     if (result == null) {
       synchronized (creationLock) {
         result = instance;
         if (result == null)
-          instance = result = new Server();
+          instance = result = new Jack();
       }
     }
     return result;

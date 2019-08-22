@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ServerTest {
+public class JackTest {
 
 
   /**
@@ -18,7 +18,7 @@ public class ServerTest {
     Int micro_ptr = new Int(-1);
     Int proto_ptr = new Int(-1);
 
-    Server.server().jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
+    Jack.server().jack_get_version(major_ptr, minor_ptr, micro_ptr, proto_ptr);
 
     assertTrue(major_ptr.value >= 0);
     assertTrue(minor_ptr.value >= 0);
@@ -35,7 +35,7 @@ public class ServerTest {
     Int major_ptr = new Int(-1);
     Int minor_ptr = new Int(-1);
 
-    Server.server().jack_get_version(major_ptr, minor_ptr, null, null);
+    Jack.server().jack_get_version(major_ptr, minor_ptr, null, null);
 
     assertTrue(major_ptr.value >= 0);
     assertTrue(minor_ptr.value >= 0);
@@ -43,7 +43,7 @@ public class ServerTest {
 
   @Test
   public void jni_get_version() {
-    int version = Server.server().jni_get_version();
+    int version = Jack.server().jni_get_version();
     assertTrue(version >= 0);
   }
 }
