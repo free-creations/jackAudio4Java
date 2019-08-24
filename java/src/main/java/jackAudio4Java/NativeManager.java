@@ -15,36 +15,38 @@
  */
 package jackAudio4Java;
 
-import com.shankyank.jniloader.JNILoader;
-import java.io.IOException;
+import com.github.fommil.jni.JniLoader;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 public class NativeManager {
 
-  private static final String libraryName = "jackaudio4java_0.0-snapshot";
-  private static volatile boolean libLoaded=false;
+  private static final Logger jniLogger = Logger.getLogger(JniLoader.class.getName());
+
+  private static final String libraryName = "libjackaudio4java_0.0-snapshot.so";
+  private static volatile boolean libLoaded = false;
   private static final Object loadLock = new Object();
 
 
-  private static boolean loadLibrary() {
-    JNILoader loader = new JNILoader();
-    try {
-      loader.extractLibs("/native", libraryName);
-    } catch (IOException e) {
-      throw new RuntimeException("Cannot load native library", e);
-    }
-    System.loadLibrary(libraryName);
-    return true;
+  private static String libName(){
+    return "native/"+libraryName;
   }
 
-  public static boolean checkNative() {
-    boolean result = libLoaded;
-    if (!result) {
-      synchronized (loadLock) {
-        result = libLoaded;
-        if (!result)
-        libLoaded = result = loadLibrary();
-      }
-    }
-    return result;
+  private static void loadLibrary() {
+    jniLogger.setLevel(SEVERE);
+    JniLoader.load(libName());
   }
+
+  public static void checkNative() {
+    if (libLoaded) return;
+
+    synchronized (loadLock) {
+      if (libLoaded) return;
+      loadLibrary();
+      libLoaded = true;
+    }
+  }
+
 }
+
