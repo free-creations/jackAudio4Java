@@ -20,10 +20,11 @@
 
 # Builds the "jack4java" library
 
-add_library(${LIB_NAME} SHARED)
 
-target_sources(${LIB_NAME} PRIVATE
+
+set(target_sources
         Server.cpp
         types_Int.cpp)
+add_library(${LIB_NAME} SHARED ${target_sources})
 target_include_directories(${LIB_NAME} PUBLIC ${JACK_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})
 target_link_libraries(${LIB_NAME} ${JNI_LIBRARIES} ${JACK_LIBRARIES})

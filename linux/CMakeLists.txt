@@ -17,10 +17,10 @@
 # limitations under the License.
 #
 #============================================================================
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.1)
 
 project(jackAudio4Java)
-set(VERSION "0.0-SNAPSHOT")
+set(VERSION "0.0.0" CACHE STRING "The project version")
 
 # enable the custom module "FindJACK.cmake"
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -34,8 +34,12 @@ find_package(JNI REQUIRED)
 # The library name shall be be the downcased project-name with version appended.
 string( TOLOWER ${CMAKE_PROJECT_NAME}_${VERSION} LIB_NAME )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
+
+# write the generated library into "build/out"
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/out)
 
 add_subdirectory(src)
-add_subdirectory(tests)
-
+IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+   add_subdirectory(tests)
+ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
