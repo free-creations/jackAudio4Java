@@ -20,7 +20,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(jackAudio4Java)
-set(VERSION "0.0.0" CACHE STRING "The project version")
+set(VERSION "x.x.x" CACHE STRING "The project version")
 
 # enable the custom module "FindJACK.cmake"
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")

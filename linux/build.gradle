@@ -15,10 +15,11 @@
  */
 
 /**
- * A gradle wrapper that runs the CMake to compile and link the native C++ source.
+ * A gradle wrapper that runs the CMake-build-system to compile and link the native C++ source.
  */
 
 plugins {
+  //https://plugins.gradle.org/plugin/net.freudasoft.gradle-cmake-plugin
   //https://github.com/freudi74/gradle-cmake-plugin
   id "net.freudasoft.gradle-cmake-plugin" version "0.0.4"
 }
@@ -27,4 +28,24 @@ plugins {
 cmake {
   sourceFolder = projectDir
   workingFolder = buildDir
+
+  buildConfig='Release'
+
+  def.VERSION=version
+}
+
+tasks.create('copyLib' , Copy) {
+  dependsOn cmakeBuild
+  from file("${buildDir}/out")
+  into file("${projectDir}/../java/src/main/resources/native/")
+  include('*.so')
+}
+
+
+cmakeClean {
+  doLast {
+    delete fileTree("${projectDir}/../java/src/main/resources/native/") {
+      include('*.so')
+    }
+  }
 }
