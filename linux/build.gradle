@@ -24,20 +24,26 @@ plugins {
   id "net.freudasoft.gradle-cmake-plugin" version "0.0.4"
 }
 
+ext {
+  deliveryDir = file("${buildDir}/out")
+  javaResourcesDir = file("${projectDir}/../java/src/main/resources/native/")
+}
 
 cmake {
-  sourceFolder = projectDir
-  workingFolder = buildDir
+  sourceFolder = project.projectDir
+  workingFolder = project.buildDir
 
   buildConfig='Release'
 
-  def.VERSION=version
+  def.VERSION=project.version
+  def.LIB_NAME = "${rootProject.name}-${rootProject.version}"
+  def.DELIVERIES_DIR = deliveryDir.toString()
 }
 
 tasks.create('copyLib' , Copy) {
   dependsOn cmakeBuild
-  from file("${buildDir}/out")
-  into file("${projectDir}/../java/src/main/resources/native/")
+  from deliveryDir
+  into javaResourcesDir
   include('*.so')
 }
 
