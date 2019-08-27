@@ -20,7 +20,7 @@ import jackAudio4Java.NativeManager;
 /**
  * Container of an Integer value.
  * Permits to pass integers by reference, as is often used in C programming.
- * Note: the java.lang.Integer class is not suitable, as this class is immutable.
+ * Note: the java.lang.Integer class is not suitable for this purpose, as this class is immutable.
  */
 public class Int {
   /**
@@ -33,16 +33,21 @@ public class Int {
     registerIDs();
   }
 
+  /**
+   * Build an Int-container holding an initial value of 0.
+   */
   public Int() {
     this(0);
   }
-
+  /**
+   * Build an Int-container holding the given initial value.
+   */
   public Int(int v) {
     value = v;
   }
 
   /**
-   * The value of this container.
+   * The value that this container holds.
    */
   public int value;
 }
