@@ -18,7 +18,6 @@ package jackAudio4Java;
 import com.github.fommil.jni.JniLoader;
 import java.util.logging.Logger;
 
-import static java.util.logging.Level.SEVERE;
 
 public class NativeManager {
 
@@ -32,12 +31,22 @@ public class NativeManager {
   private static String libName(){
     return "native/"+libraryName;
   }
-
+  /**
+   * Initialize the system by loading the necessary __native libraries__ from the resource bundle.
+   *
+   * @throws RuntimeException When no Library matching the Operating System and processor architecture
+   *                     of the the runtime platform could be found.
+   */
   private static void loadLibrary() {
-    jniLogger.setLevel(SEVERE);
     JniLoader.load(libName());
   }
-
+  /**
+   * Checks if the necessary __native libraries__ are loaded and automatically loads
+   * them if needed.
+   *
+   * @throws RuntimeException When no Library matching the Operating System and processor architecture
+   *                     of the the runtime platform could be found.
+   */
   public static void checkNative() {
     if (libLoaded) return;
 

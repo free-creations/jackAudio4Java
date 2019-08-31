@@ -29,10 +29,17 @@ public interface ProcessListener {
    * nframes == jack_get_buffer_size()
    * nframes == pow(2,x)
    * ```
+   * The code supplied in this function must be suitable for real-time
+   * execution.  That means that it cannot call functions that might
+   * block for a long time. This includes malloc, free, printf,
+   * pthread_mutex_lock, sleep, wait, poll, select, pthread_join,
+   * pthread_cond_wait, etc, etc. See
+   * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
+   * for more information.
    *
    * @param nframes number of frames to process
    * @param arg     pointer to a client supplied structure
    * @return zero on success, non-zero on error
    */
-  public int process(int nframes, Object arg);
+   int process(int nframes, Object arg);
 }

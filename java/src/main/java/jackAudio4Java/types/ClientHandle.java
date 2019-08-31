@@ -16,8 +16,8 @@
 package jackAudio4Java.types;
 
 /**
- *  ClientHandle is an opaque type.  You may only access it using the
- *  API provided.
+ *  ClientHandle is an opaque type.  It stores a reference to this client.
  */
 public class ClientHandle {
+
 }

@@ -15,8 +15,12 @@
  */
 package jackAudio4Java.types;
 
-public class Status {
-  public int statusBits = 0;
+public class OpenStatus {
+  private int statusBits = 0;
+
+  public OpenStatus(int statusBits) {
+    this.statusBits = statusBits;
+  }
 
   /**
    * Overall operation failed.
@@ -33,8 +37,9 @@ public class Status {
   }
 
   /**
-   * The desired client name was not unique.  With the @ref
-   * JackUseExactName option this situation is fatal.  Otherwise,
+   * The desired client name was not unique.  With the
+   * {@link OpenOption#UseExactName }
+   *  option this situation is fatal.  Otherwise,
    * the name was modified by appending a dash and a two-digit
    * number in the range "-01" to "-99".  The
    * jack_get_client_name() function will return the exact string
