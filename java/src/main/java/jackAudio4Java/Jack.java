@@ -365,8 +365,8 @@ public class Jack {
   /**
    * Tentative replacement for the portGetBuffer function.
    * @param port an opaque handle representing a port.
-   * @param receivedData a container for data that this has received (can be null for pure output ports)
-   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports)
+   * @param receivedData a container for data that this has received (can be null for pure output ports).
+   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports).
    * @return  0 on success, otherwise a non-zero error code.
    */
   public int portExchangeAudioData(PortHandle port, float[] receivedData, float[] sendingData ){
@@ -375,8 +375,8 @@ public class Jack {
   /**
    * Tentative replacement for the portGetBuffer function.
    * @param port an opaque handle representing a port.
-   * @param receivedData a container for data that this has received (can be null for pure output ports)
-   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports)
+   * @param receivedData a container for data that this has received (can be null for pure output ports).
+   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports).
    * @return  0 on success, otherwise a non-zero error code.
    */
   public int portExchangeByteData(PortHandle port, byte[] receivedData, byte[] sendingData ){

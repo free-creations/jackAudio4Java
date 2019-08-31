@@ -38,11 +38,11 @@ public:
                      types::jIntObject minorRef,
                      types::jIntObject microRef,
                      types::jIntObject protoRef) {
-        Java_jackAudio4Java_Jack__1jack_1get_1version(env, nullptr, majorRef, minorRef, microRef, protoRef);
+        Java_jackAudio4Java_Jack_getJackVersionN(env, nullptr, majorRef, minorRef, microRef, protoRef);
     }
 
     static jint inline
     jni_get_version(JNIEnv *env) {
-        return Java_jackAudio4Java_Jack__1jni_1get_1version(env, nullptr);
+        return Java_jackAudio4Java_Jack_getJniVersionN(env, nullptr);
     }
 };

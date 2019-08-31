@@ -60,7 +60,7 @@ namespace types {
  * @param env pointer to the JNI environment.
  * @param clazz JNI reference to the Java- class of the Int container.
  */
-JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_registerIDs(JNIEnv *env, jclass clazz) {
+JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_registerIdsN(JNIEnv *env, jclass clazz) {
     // cache field IDs.
     // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
     types::Int::value_ID = env->GetFieldID(clazz, "value", "I");

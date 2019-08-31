@@ -20,17 +20,18 @@ import jackAudio4Java.NativeManager;
 /**
  * Container of an Integer value.
  * Permits to pass integers by reference, as is often used in C programming.
- * Note: the java.lang.Integer class is not suitable for this purpose, as this class is immutable.
+ *
+ * Note: the `java.lang.Integer` class is not suitable for this purpose, as it is immutable.
  */
 public class Int {
   /**
    * Registers JNI specific identities.
    **/
-  private static native void registerIDs();
+  private static native void registerIdsN();
 
   static {
     NativeManager.checkNative();
-    registerIDs();
+    registerIdsN();
   }
 
   /**

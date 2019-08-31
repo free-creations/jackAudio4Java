@@ -38,6 +38,7 @@ cmake {
   def.VERSION=project.version
   def.LIB_NAME = "${rootProject.name}-${rootProject.version}"
   def.DELIVERIES_DIR = deliveryDir.toString()
+  def.WITH_UNIT_TESTS = "OFF"
 }
 
 tasks.create('copyLib' , Copy) {

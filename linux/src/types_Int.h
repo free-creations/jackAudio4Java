@@ -45,7 +45,7 @@ namespace types {
         static std::atomic<jfieldID> value_ID;
 
         static void inline registerIDs(JNIEnv *env, jclass clazz) {
-            Java_jackAudio4Java_types_Int_registerIDs(env, clazz);
+            Java_jackAudio4Java_types_Int_registerIdsN(env, clazz);
         }
 
         static void setValue(JNIEnv *env, jIntObject IntContainer, jint value);
