@@ -189,10 +189,12 @@ public class Jack {
   /**
    * The actual name of this client.
    *
-   * @return the actual client name.  This is useful when {@link OpenOption#UseExactName}
+   * This is useful when {@link OpenOption#UseExactName}
    * is not specified on open and {@link OpenStatus#hasNameNotUnique()}
    * status was returned.  In that case, the actual
    * name will differ from the `clientName` requested.
+   *
+   * @return the actual client name.
    */
   public String getClientName(ClientHandle clientHandle) {
     //remove one char accounting for the final NULL character.
@@ -202,8 +204,7 @@ public class Jack {
   // jack.h - 204
 
   /**
-   * Tell the Jack server that the program is ready to start processing
-   * audio.
+   * Tell the Jack server that the program is ready to start processing.
    *
    * @return 0 on success, otherwise a non-zero error code
    */
@@ -227,14 +228,8 @@ public class Jack {
   // jack.h - line 316
 
   /**
-   * Register a function (and argument) to be called if and when the
-   * JACK server shuts down the client thread.  The function must
-   * be written as if it were an asynchonrous POSIX signal
-   * handler --- use only async-safe functions, and remember that it
-   * is executed from another thread.  A typical function might
-   * set a flag or write to a pipe so that the rest of the
-   * application knows that the JACK client thread has shut
-   * down.
+   * Register a function (and optionally an argument) to be called if and when the
+   * JACK server shuts down the client thread.
    * <p>
    * NOTE: clients do not need to call this.  It exists only
    * to help more complex clients understand what is going
@@ -264,14 +259,13 @@ public class Jack {
   // jack.h line 377
 
   /**
-   * Tell the Jack server to call {@link ProcessListener#process(int, Object)}
+   * Tell the Jack server to call {@link ProcessListener#onProcess(int, Object)}
    * whenever there is work be done.
-   * <p>
-   * The parameter {@code arg } will be passed
-   * as second argument (mind the risk of race conditions by making {@code arg } immutable).
-   * <p>
-   * <p>
-   * NOTE: this function cannot be called while the client is activated
+   *
+   * The parameter `arg` will be passed
+   * as second argument (mind the risk of race conditions and make `arg` immutable).
+   *
+   * NOTE: this function cannot be called while the client is active
    * (after {@link #activate(ClientHandle)} has been called.)
    *
    * @param client          an opaque handle representing this client.
@@ -289,23 +283,24 @@ public class Jack {
   // jack.h - line 711
 
   /**
-   * Create a new port for the client. This is an object used for moving
-   * data of any type in or out of the client.  Ports may be connected
-   * in various ways.
-   * <p>
+   * Create a new port for the client.
+   *
+   * This is an object used for moving data of any type in or out of the client.
+   * Ports may be connected in various ways.
+   *
    * Each port has a _short name_.  The port's _full name_ contains the name
    * of the client concatenated with a colon (:) followed by its _short name_.
    * The {@link #portNameSize()} is the maximum length of this _full name_.
    * Exceeding that will cause the port registration to fail and return `null`.
-   * <p>
+   *
    * The `portName` must be unique among all ports owned by this client.
    * If the name is not unique, the registration will fail.
-   * <p>
+   *
    * All ports have a _type_, defined by the parameter `portType`.
    *
-   * @param client     pointer to JACK client structure.
-   * @param portName   non-empty _short name_ for the new port (not
-   *                   including the leading `client_name:`). Must be unique.
+   * @param client     an opaque handle representing this client.
+   * @param portName   non-empty _short name_ for the new port (shall not
+   *                   include the leading `client_name:`). Must be unique.
    * @param portType   the port-type.  See {@link PortType}
    * @param flags      a set of {@link PortFlags}.
    * @param bufferSize must be non-zero if this is not a built-in
@@ -325,28 +320,22 @@ public class Jack {
                                            String portType,
                                            long flags,
                                            long bufferSize);
-
-  // jack.h - 975
+  // jack.h -line 944
 
   /**
-   * Establish a connection between two ports.
-   * <p>
-   * When a connection exists, data written to the _source port_ will
-   * be available to be read at the _destination port_.
-   * <p>
-   * - The port types must be identical.
-   * - The @ref JackPortFlags of the __source_port__ must include @ref
-   * JackPortIsOutput.
-   * - The @ref JackPortFlags of the __destination_port__ must include @ref JackPortIsInput.
+   * Switch input monitoring on or off.
    *
-   * @return 0 on success, EEXIST if the connection is already made,
-   * otherwise a non-zero error code
+   * If  {@link PortFlags#canMonitor}  is set for this _port_, turn input
+   * monitoring on or off.  Otherwise, do nothing.
+   *
+   * @param portHandle an opaque handle representing a port.
+   * @param on         if `true`, turn monitoring on. If `false`, turn monitoring off.
+   * @return unknown
    */
-  public int connect(ClientHandle client,
-                     String sourcePort,
-                     String destinationPort) {
+  public int portRequestMonitor(PortHandle portHandle, boolean on) {
     throw new NotYetImplementedException();
   }
+
 
   // jack.h - line 755
 
@@ -357,7 +346,7 @@ public class Jack {
    * containing the data from the port's connection(s), or
    * zero-filled. if there are multiple inbound connections, the data
    * will be mixed appropriately.
-   * <p>
+   *
    * FOR OUTPUT PORTS ONLY : DEPRECATED in Jack 2.0 !!
    * ---------------------------------------------------
    * You may cache the value returned, but only between calls to
@@ -369,7 +358,51 @@ public class Jack {
    * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
    * Port buffers have to be retrieved in each callback for proper functionning.
    */
-  public Object port_get_buffer(PortHandle port, int sampleFrameCount) {
+  public Object portGetBuffer(PortHandle port, int sampleFrameCount) {
+    throw new NotYetImplementedException();
+  }
+
+  /**
+   * Tentative replacement for the portGetBuffer function.
+   * @param port an opaque handle representing a port.
+   * @param receivedData a container for data that this has received (can be null for pure output ports)
+   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports)
+   * @return  0 on success, otherwise a non-zero error code.
+   */
+  public int portExchangeAudioData(PortHandle port, float[] receivedData, float[] sendingData ){
+    throw new NotYetImplementedException();
+  }
+  /**
+   * Tentative replacement for the portGetBuffer function.
+   * @param port an opaque handle representing a port.
+   * @param receivedData a container for data that this has received (can be null for pure output ports)
+   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports)
+   * @return  0 on success, otherwise a non-zero error code.
+   */
+  public int portExchangeByteData(PortHandle port, byte[] receivedData, byte[] sendingData ){
+    throw new NotYetImplementedException();
+  }
+
+
+
+  // jack.h - 975
+
+  /**
+   * Establish a connection between two ports.
+   *
+   * When a connection exists, data written to the __source port__ will
+   * be available to be read at the __destination port__.
+   *
+   * - The _port-types_ must be identical.
+   * - The  {@link PortFlags} of the __source_port__ must include {@link PortFlags#isOutput}.
+   * - The  {@link PortFlags}  of the __destination_port__ must include {@link PortFlags#isInput}.
+   *
+   * @return 0 on success, EEXIST if the connection is already made,
+   * otherwise a non-zero error code
+   */
+  public int connect(ClientHandle client,
+                     String sourcePort,
+                     String destinationPort) {
     throw new NotYetImplementedException();
   }
   // jack.h - line 1024
@@ -393,17 +426,18 @@ public class Jack {
   /**
    * The maximum number of characters in a JACK port type name.
    *
-   * @return the maximum number of characters in a JACK port type name
-   * including the final NULL character.  This value is a constant.
+   * @return the maximum number of characters in a JACK port type name.
+   * This value is a constant.
    */
   public int portTypeSize() {
+    // subtract one to account for the final NULL character.
     throw new NotYetImplementedException();
   }
 
   // jack.h - line 1265
 
   /**
-   * Looking up ports / PortSearching
+   * Look up ports - search ports.
    *
    * @param port_name_pattern A regular expression used to select
    *                          ports by name.  If NULL or of zero length, no selection based

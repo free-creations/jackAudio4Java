@@ -8,7 +8,7 @@ import jackAudio4Java.Jack;
  * Currently predefined _port types_ for _Audio_ and _Midi_
  * are built into the JACK API.
  *
- * Only ports of the same type can be connected
+ * Only ports of the same type can be connected.
  */
 public class PortType {
 

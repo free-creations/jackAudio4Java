@@ -18,53 +18,52 @@ package jackAudio4Java.types;
 public enum PortFlags {
 
   /**
-   * if JackPortIsInput is set, then the port can receive
+   * if `isInput` is set, then the port can receive
    * data.
    */
-  JackPortIsInput(0x1),
+  isInput(0x1),
 
   /**
-   * if JackPortIsOutput is set, then data can be read from
+   * if `isOutput` is set, then data can be read from
    * the port.
    */
-  JackPortIsOutput(0x2),
+  isOutput(0x2),
 
   /**
-   * if JackPortIsPhysical is set, then the port corresponds
+   * If `isPhysical` is set, then the port corresponds
    * to some kind of physical I/O connector.
    */
-  JackPortIsPhysical(0x4),
+  isPhysical(0x4),
 
   /**
-   * if JackPortCanMonitor is set, then a call to
-   * jack_port_request_monitor() makes sense.
-   * <p>
+   * If the `canMonitor` flag is set, then a call to
+   * {@link jackAudio4Java.Jack#portRequestMonitor(PortHandle, boolean)} makes sense.
+   *
    * Precisely what this means is dependent on the client. A typical
    * result of it being called with TRUE as the second argument is
    * that data that would be available from an output port (with
-   * JackPortIsPhysical set) is sent to a physical output connector
+   * {@link PortFlags#isPhysical} set) is sent to a physical output connector
    * as well, so that it can be heard/seen/whatever.
-   * <p>
+   *
    * Clients that do not control physical interfaces
    * should never create ports with this bit set.
    */
-  JackPortCanMonitor(0x8),
+  canMonitor(0x8),
 
   /**
-   * JackPortIsTerminal means:
-   * <p>
-   * for an input port: the data received by the port
-   * will not be passed on or made
-   * available at any other port
-   * <p>
-   * for an output port: the data available at the port
-   * does not originate from any other port
-   * <p>
+   * isTerminal means that the port is at the boundary to the outside world.
+   *
+   * - for an __input port__: the data received by the port
+   *   will not be passed on or made
+   *   available at any other port
+   * - for an __output port__: the data available at the port
+   *   does not originate from any other port
+   *
    * Audio synthesizers, I/O hardware interface clients, HDR
    * systems are examples of clients that would set this flag for
    * their ports.
    */
-  JackPortIsTerminal(0x10);
+  isTerminal(0x10);
 
   private final long bits;
 

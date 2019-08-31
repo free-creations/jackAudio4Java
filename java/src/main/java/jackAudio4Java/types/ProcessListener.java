@@ -41,5 +41,5 @@ public interface ProcessListener {
    * @param arg     pointer to a client supplied structure
    * @return zero on success, non-zero on error
    */
-   int process(int nframes, Object arg);
+   int onProcess(int nframes, Object arg);
 }
