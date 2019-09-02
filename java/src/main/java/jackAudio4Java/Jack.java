@@ -363,13 +363,27 @@ public class Jack {
   }
 
   /**
-   * Tentative replacement for the portGetBuffer function.
-   * @param port an opaque handle representing a port.
-   * @param receivedData a container for data that this has received (can be null for pure output ports).
-   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports).
+   * Receive audio data from an input port.
+   *
+   * The port must have been created with the flag {@link PortFlags#isInput}.
+   *
+   * @param inputPort an opaque handle representing a inputPort.
+   * @param inputContainer a client supplied container that will be filled with the received data.
    * @return  0 on success, otherwise a non-zero error code.
    */
-  public int portExchangeAudioData(PortHandle port, float[] receivedData, float[] sendingData ){
+  public int portGetAudioData(PortHandle inputPort, float[] inputContainer){
+    throw new NotYetImplementedException();
+  }
+  /**
+   * Send data over an output port.
+   *
+   * The port must have been created with the flag {@link PortFlags#isOutput}.
+   *
+   * @param outputPort an opaque handle representing a outputPort.
+   * @param output a container for data that shall be send over this outputPort.
+   * @return  0 on success, otherwise a non-zero error code.
+   */
+  public int portSendAudioData(PortHandle outputPort, float[] output){
     throw new NotYetImplementedException();
   }
   /**
