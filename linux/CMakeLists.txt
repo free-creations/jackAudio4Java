@@ -33,7 +33,7 @@ set(LIB_NAME ${DEFAULT_LIB_NAME} CACHE STRING "The name (stem) of the library")
 # The directory where the final artifacts should be delivered is given on the command line, otherwise we'll use "build/out".
 set(DELIVERIES_DIR "${PROJECT_BINARY_DIR}/out" CACHE STRING "The directory where the library should be delivered")
 
-# THe unit tests take quite long to compile
+# The unit tests take quite long to compile. So we make building with unit-tests an option.
 set(WITH_UNIT_TESTS ON CACHE BOOL "Should unit-test be build.")
 
 
