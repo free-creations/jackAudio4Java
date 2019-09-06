@@ -25,6 +25,8 @@
 #include <jni.h>
 #include "types_Int.h"
 
+#include "spdlog/spdlog.h"
+
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
 #endif
@@ -49,6 +51,7 @@ namespace types {
     * @param value the new value.
     */
     void Int::setValue(JNIEnv *env, jIntObject IntContainer, jint value) {
+
         if (IntContainer) env->SetIntField(IntContainer, value_ID, value);
     }
 }
@@ -61,9 +64,13 @@ namespace types {
  * @param clazz JNI reference to the Java- class of the Int container.
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_types_Int_registerIdsN(JNIEnv *env, jclass clazz) {
+    SPDLOG_TRACE("Java_jackAudio4Java_types_Int_registerIdsN");
+
     // cache field IDs.
     // Note: we shall not cache the clazz. It might vary over the lifetime of the JVM process.
     types::Int::value_ID = env->GetFieldID(clazz, "value", "I");
-    if (!types::Int::value_ID)
+    if (!types::Int::value_ID) {
+        SPDLOG_CRITICAL("class `jackAudio4Java_types_Int` has no `value` field");
         env->FatalError("JNI Fatal Error - class `jackAudio4Java_types_Int` has no `value` field");
+    }
 }

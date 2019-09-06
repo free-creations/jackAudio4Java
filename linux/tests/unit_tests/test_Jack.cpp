@@ -34,6 +34,7 @@ using namespace jnimock;
 class JackTest : public ::testing::Test {
 protected:
     void SetUp() override {
+        Jack::setLoggingLevel(0);
     }
 
     // void TearDown() override {}

@@ -18,6 +18,7 @@ package jackAudio4Java;
 import jackAudio4Java.types.*;
 
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * use it like this:
@@ -50,6 +51,39 @@ public class Jack {
     }
     return result;
   }
+
+  private final static int NATIVE_LEVEL_TRACE = 0;
+  private final static int NATIVE_LEVEL_DEBUG = 1;
+  private final static int NATIVE_LEVEL_INFO = 2;
+  private final static int NATIVE_LEVEL_WARN = 3;
+  private final static int NATIVE_LEVEL_ERROR = 4;
+  private final static int NATIVE_LEVEL_CRITICAL = 5;
+  private final static int NATIVE_LEVEL_OFF = 6;
+
+  /**
+   * Translate the logging level as used by the java.util.logging (JUL)
+   * library to those used be the "spdlog" library used in the native part.
+   * @param javaLevel the level used in java.util.logging (JUL).
+   * @return the corresponding level used in the native part.
+   */
+  private int julToNativeLogginglevel(Level javaLevel) {
+    if(javaLevel.intValue()<= Level.FINE.intValue()) return NATIVE_LEVEL_TRACE;
+    if(javaLevel.intValue()<= Level.CONFIG.intValue()) return NATIVE_LEVEL_DEBUG;
+    if(javaLevel.intValue()<= Level.INFO.intValue()) return NATIVE_LEVEL_INFO;
+    if(javaLevel.intValue()<= Level.WARNING.intValue()) return NATIVE_LEVEL_WARN;
+    if(javaLevel.intValue()<= Level.SEVERE.intValue()) return NATIVE_LEVEL_ERROR;
+    return NATIVE_LEVEL_OFF;
+
+  }
+
+  /**
+   * Set the level of logging that will be used to control logging output.
+   * @param level the level as defined in java.util.logging.Level
+   */
+  public void setLoggingLevel(Level level) {
+    setLoggingLevelN(julToNativeLogginglevel(level));
+  }
+  private native static void setLoggingLevelN(int level);
 
   private static class ReadableClientHandle extends ClientHandle {
     /**
@@ -367,36 +401,38 @@ public class Jack {
    *
    * The port must have been created with the flag {@link PortFlags#isInput}.
    *
-   * @param inputPort an opaque handle representing a inputPort.
+   * @param inputPort      an opaque handle representing a inputPort.
    * @param inputContainer a client supplied container that will be filled with the received data.
-   * @return  0 on success, otherwise a non-zero error code.
+   * @return 0 on success, otherwise a non-zero error code.
    */
-  public int portGetAudioData(PortHandle inputPort, float[] inputContainer){
+  public int portGetAudioData(PortHandle inputPort, float[] inputContainer) {
     throw new NotYetImplementedException();
   }
+
   /**
    * Send data over an output port.
    *
    * The port must have been created with the flag {@link PortFlags#isOutput}.
    *
    * @param outputPort an opaque handle representing a outputPort.
-   * @param output a container for data that shall be send over this outputPort.
-   * @return  0 on success, otherwise a non-zero error code.
+   * @param output     a container for data that shall be send over this outputPort.
+   * @return 0 on success, otherwise a non-zero error code.
    */
-  public int portSendAudioData(PortHandle outputPort, float[] output){
-    throw new NotYetImplementedException();
-  }
-  /**
-   * Tentative replacement for the portGetBuffer function.
-   * @param port an opaque handle representing a port.
-   * @param receivedData a container for data that this has received (can be null for pure output ports).
-   * @param sendingData a container for data that shall be send over this port (can be null for pure input ports).
-   * @return  0 on success, otherwise a non-zero error code.
-   */
-  public int portExchangeByteData(PortHandle port, byte[] receivedData, byte[] sendingData ){
+  public int portSendAudioData(PortHandle outputPort, float[] output) {
     throw new NotYetImplementedException();
   }
 
+  /**
+   * Tentative replacement for the portGetBuffer function.
+   *
+   * @param port         an opaque handle representing a port.
+   * @param receivedData a container for data that this has received (can be null for pure output ports).
+   * @param sendingData  a container for data that shall be send over this port (can be null for pure input ports).
+   * @return 0 on success, otherwise a non-zero error code.
+   */
+  public int portExchangeByteData(PortHandle port, byte[] receivedData, byte[] sendingData) {
+    throw new NotYetImplementedException();
+  }
 
 
   // jack.h - 975

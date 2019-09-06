@@ -20,6 +20,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "jnimock/jnimock.h"
+#include "Jack.h"
 #include "types_Int.h"
 #include "jni.h"
 
@@ -43,6 +44,7 @@ struct _jfieldID {
 class types_IntTest : public ::testing::Test {
 protected:
     void SetUp() override {
+        Jack::setLoggingLevel(0);
     }
 
     void TearDown() override {}

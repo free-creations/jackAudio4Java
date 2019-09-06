@@ -1,12 +1,19 @@
 package jackAudio4Java;
 
 import jackAudio4Java.types.Int;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.logging.Level;
 
 import static org.junit.Assert.assertTrue;
 
 public class JackTest {
 
+  @Before
+  public void setUp() {
+    Jack.server().setLoggingLevel(Level.ALL);
+  }
 
   /**
    * The function Server.jack_get_version shall return the version of the jack library.

@@ -36,6 +36,40 @@ using namespace std;
 
 #include "spdlog/spdlog.h"
 
+/**
+ * Set the level of logging that will be used to control logging output.
+ * @param level the level as defined in src/3rdparty/spdlog/common.h
+ */
+JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_setLoggingLevelN
+        (JNIEnv *, jclass, jint level){
+    switch(level)
+    {
+        case jackAudio4Java_Jack_NATIVE_LEVEL_TRACE:
+            spdlog::set_level(spdlog::level::trace);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_DEBUG:
+            spdlog::set_level(spdlog::level::debug);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_INFO:
+            spdlog::set_level(spdlog::level::info);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_WARN:
+            spdlog::set_level(spdlog::level::warn);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_ERROR:
+            spdlog::set_level(spdlog::level::err);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_CRITICAL:
+            spdlog::set_level(spdlog::level::critical);
+            break;
+        case jackAudio4Java_Jack_NATIVE_LEVEL_OFF:
+            spdlog::set_level(spdlog::level::off);
+            break;
+        default:
+            spdlog::set_level(spdlog::level::trace);
+    }
+}
+
 
 /**
  * Function `private native static void _jack_get_version(Int majorRef, Int minorRef, Int microRef,Int protoRef);`
@@ -49,7 +83,7 @@ using namespace std;
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_getJackVersionN
         (JNIEnv *env, jclass, jobject majorRef, jobject minorRef, jobject microRef, jobject protoRef) {
-    spdlog::set_level(spdlog::level::trace);
+
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_getJackVersionN");
 
     int majorVal = -1;
@@ -86,5 +120,8 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_getJackVersionN
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_getJniVersionN
         (JNIEnv *env, jclass) {
+
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_getJniVersionN");
+
     return env->GetVersion();
 }

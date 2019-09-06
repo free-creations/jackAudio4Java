@@ -33,6 +33,11 @@ class Jack {
 public:
 
     static void inline
+    setLoggingLevel(jint level) {
+        Java_jackAudio4Java_Jack_setLoggingLevelN(nullptr, nullptr, level);
+    }
+
+    static void inline
     jack_get_version(JNIEnv *env,
                      types::jIntObject majorRef,
                      types::jIntObject minorRef,
