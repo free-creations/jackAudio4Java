@@ -18,12 +18,12 @@
  */
 
 /**
- * This unit implements the native methods of the Java class: `jackAudio4Java.Server`
+ * This unit implements the native methods of the Java class: `jackAudio4Java.Jack`
  *
  */
 #include <jni.h>
 #include <jack/jack.h>
-#include "Server.h"
+#include "Jack.h"
 
 
 

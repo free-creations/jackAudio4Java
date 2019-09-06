@@ -21,7 +21,7 @@
 #include "gmock/gmock.h"
 #include "jnimock/jnimock.h"
 
-#include "Server.h"
+#include "Jack.h"
 
 using testing::Return;
 using testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
@@ -63,7 +63,7 @@ TEST_F(JackTest, jack_get_version) {
             .Times(1);
 
     // here we go...
-    Server::jack_get_version(&jniEnvMock, &major, &minor, &micro, &proto);
+    Jack::jack_get_version(&jniEnvMock, &major, &minor, &micro, &proto);
 
 }
 /**
@@ -79,6 +79,6 @@ TEST_F(JackTest, jni_get_version) {
             .WillByDefault(Return(JNI_VERSION_1_6));
 
     // here we go...
-    jint version = Server::jni_get_version(&jniEnvMock);
+    jint version = Jack::jni_get_version(&jniEnvMock);
     EXPECT_EQ(version, JNI_VERSION_1_6);
 }

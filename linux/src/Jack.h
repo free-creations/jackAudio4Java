@@ -1,5 +1,5 @@
 /*
- * File: Server.h
+ * File: Jack.h
  *
  *
  * Copyright 2019 Harald Postner <Harald at free_creations.de>.
@@ -29,7 +29,7 @@
  * more intelligible names like `Server::jni_get_version`.
  *
  */
-class Server {
+class Jack {
 public:
 
     static void inline

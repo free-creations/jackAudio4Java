@@ -40,12 +40,18 @@ struct _jfieldID {
     // This will enable us to create empty objects of type _jfieldID.
 };
 
+class types_IntTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+    }
 
+    void TearDown() override {}
+ };
 
 /**
  * When the no fieldID can be found, 'registerIDs' shall throw a Fatal Exception into the JVM.
  */
-TEST(types_Int, registerIDs_badField) {
+TEST_F(types_IntTest, registerIDs_badField) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jclass clazz;
 
@@ -64,7 +70,7 @@ TEST(types_Int, registerIDs_badField) {
 /**
  * When the `fieldID` is OK, we expect `registerIDs` to store this `fieldID` into `types::Int::value_ID`
  */
-TEST(types_Int, registerIDs) {
+TEST_F(types_IntTest, registerIDs) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jfieldID fieldID;
     _jclass clazz;
@@ -83,7 +89,7 @@ TEST(types_Int, registerIDs) {
 /**
  * Function `setValue` shall push a new value into the `value` field of the `Int` object.
  */
-TEST(types_Int, setValue) {
+TEST_F(types_IntTest, setValue) {
     NiceMock<JNIEnvMock> jniEnvMock;
     _jIntObject intObject;
     jint newValue = 4711;

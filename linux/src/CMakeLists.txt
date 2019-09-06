@@ -28,7 +28,7 @@
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=0")
 
 set(target_sources
-        Server.cpp
+        Jack.cpp
         types_Int.cpp)
 add_library(${LIB_NAME} SHARED ${target_sources})
 target_include_directories(${LIB_NAME} PUBLIC ${JACK_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})

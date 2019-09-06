@@ -24,7 +24,7 @@ set(UNIT_TEST_EXE_NAME unit_Tests_run)
 
 
 set(target_sources
-        test_Server.cpp
+        test_Jack.cpp
         test_types_Int.cpp
         ${CMAKE_SOURCE_DIR}/tests/lib/jnimock/jnimock.cpp)
 
