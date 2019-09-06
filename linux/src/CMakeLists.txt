@@ -20,11 +20,17 @@
 
 # Builds the "jack4java" library
 
-
+# set the SPDLOG_ACTIVE_LEVEL
+# This level controls which logging messages shall be compiled
+# and which messages can be discarded at compile time.
+# setting SPDLOG_ACTIVE_LEVEL to 0 means, all messages (including trace messages)
+# shall be comipled.
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=0")
 
 set(target_sources
         Server.cpp
         types_Int.cpp)
 add_library(${LIB_NAME} SHARED ${target_sources})
 target_include_directories(${LIB_NAME} PUBLIC ${JACK_INCLUDE_DIR} ${JNI_INCLUDE_DIRS})
+target_include_directories(${LIB_NAME} PRIVATE 3rdparty)
 target_link_libraries(${LIB_NAME} ${JNI_LIBRARIES} ${JACK_LIBRARIES})

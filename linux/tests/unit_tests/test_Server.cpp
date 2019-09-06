@@ -31,11 +31,19 @@ using testing::Ge;
 
 using namespace jnimock;
 
+class JackTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+    }
+
+    // void TearDown() override {}
+};
+
 /**
  * Function `Server::jack_get_version` shall push the _jack library_ version into the
  * `Int` objects provided by the caller.
  */
-TEST(Server, jack_get_version) {
+TEST_F(JackTest, jack_get_version) {
     NiceMock<JNIEnvMock> jniEnvMock;
     types::_jIntObject major;
     types::_jIntObject minor;
@@ -61,7 +69,7 @@ TEST(Server, jack_get_version) {
 /**
  * The version returned by function `Sever.jni_get_version` shall be the version given by `jniEnv.GetVersion`.
  */
-TEST(Server, jni_get_version) {
+TEST_F(JackTest, jni_get_version) {
 
     NiceMock<JNIEnvMock> jniEnvMock;
     jclass clazz = nullptr;

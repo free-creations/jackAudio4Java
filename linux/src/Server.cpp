@@ -34,6 +34,7 @@
 using namespace std;
 
 
+#include "spdlog/spdlog.h"
 
 
 /**
@@ -48,6 +49,8 @@ using namespace std;
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_getJackVersionN
         (JNIEnv *env, jclass, jobject majorRef, jobject minorRef, jobject microRef, jobject protoRef) {
+    spdlog::set_level(spdlog::level::trace);
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_getJackVersionN");
 
     int majorVal = -1;
     int minorVal = -1;
