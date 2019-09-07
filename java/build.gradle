@@ -54,7 +54,7 @@ ext {
 compileJava {
   // JNI headers to be written to ../linux/src/jni_headers
   options.headerOutputDirectory = headerDir
-  options.compilerArgs += "-Xlint:deprecation"
+  //options.compilerArgs += "-Xlint:deprecation"
 }
 
 clean {
