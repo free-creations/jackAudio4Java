@@ -20,4 +20,9 @@ package jackAudio4Java.types;
  */
 public class ClientHandle {
 
+  /**
+   * The native address of this client. Only the class{@link jackAudio4Java.Jack}
+   * shall have access to this item.
+   */
+  protected long reference;
 }

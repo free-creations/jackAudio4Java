@@ -20,6 +20,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "jnimock/jnimock.h"
+#include "jni_headers/jackAudio4Java_Jack.h"
 
 #include "Jack.h"
 
@@ -82,4 +83,19 @@ TEST_F(JackTest, jni_get_version) {
     // here we go...
     jint version = Jack::jni_get_version(&jniEnvMock);
     EXPECT_EQ(version, JNI_VERSION_1_6);
+}
+
+TEST_F(JackTest, portNameSize) {
+    int portNameSize = Java_jackAudio4Java_Jack_portNameSizeN(nullptr, nullptr);
+    EXPECT_GT(portNameSize, 0);
+}
+
+TEST_F(JackTest, portTypeSize) {
+    int portTypeSize = Java_jackAudio4Java_Jack_portTypeSizeN(nullptr, nullptr);
+    EXPECT_GT(portTypeSize, 0);
+}
+
+TEST_F(JackTest, clientNameSize) {
+    int clientNameSize = Java_jackAudio4Java_Jack_clientNameSizeN(nullptr, nullptr);
+    EXPECT_GT(clientNameSize, 0);
 }

@@ -63,26 +63,29 @@ public class Jack {
   /**
    * Translate the logging level as used by the java.util.logging (JUL)
    * library to those used be the "spdlog" library used in the native part.
+   *
    * @param javaLevel the level used in java.util.logging (JUL).
    * @return the corresponding level used in the native part.
    */
   private int julToNativeLogginglevel(Level javaLevel) {
-    if(javaLevel.intValue()<= Level.FINE.intValue()) return NATIVE_LEVEL_TRACE;
-    if(javaLevel.intValue()<= Level.CONFIG.intValue()) return NATIVE_LEVEL_DEBUG;
-    if(javaLevel.intValue()<= Level.INFO.intValue()) return NATIVE_LEVEL_INFO;
-    if(javaLevel.intValue()<= Level.WARNING.intValue()) return NATIVE_LEVEL_WARN;
-    if(javaLevel.intValue()<= Level.SEVERE.intValue()) return NATIVE_LEVEL_ERROR;
+    if (javaLevel.intValue() <= Level.FINE.intValue()) return NATIVE_LEVEL_TRACE;
+    if (javaLevel.intValue() <= Level.CONFIG.intValue()) return NATIVE_LEVEL_DEBUG;
+    if (javaLevel.intValue() <= Level.INFO.intValue()) return NATIVE_LEVEL_INFO;
+    if (javaLevel.intValue() <= Level.WARNING.intValue()) return NATIVE_LEVEL_WARN;
+    if (javaLevel.intValue() <= Level.SEVERE.intValue()) return NATIVE_LEVEL_ERROR;
     return NATIVE_LEVEL_OFF;
 
   }
 
   /**
    * Set the level of logging that will be used to control logging output.
+   *
    * @param level the level as defined in java.util.logging.Level
    */
   public void setLoggingLevel(Level level) {
     setLoggingLevelN(julToNativeLogginglevel(level));
   }
+
   private native static void setLoggingLevelN(int level);
 
   private static class ReadableClientHandle extends ClientHandle {
@@ -215,8 +218,10 @@ public class Jack {
    */
   public int clientNameSize() {
     //remove one char accounting for the final NULL character.
-    throw new NotYetImplementedException();
+    return clientNameSizeN() - 1;
   }
+
+  private native static int clientNameSizeN();
 
   // jack.h - 141
 
@@ -231,7 +236,6 @@ public class Jack {
    * @return the actual client name.
    */
   public String getClientName(ClientHandle clientHandle) {
-    //remove one char accounting for the final NULL character.
     throw new NotYetImplementedException();
   }
 
@@ -466,7 +470,7 @@ public class Jack {
    */
   public int portNameSize() {
     // subtract one to account for the final NULL character.
-    throw new NotYetImplementedException();
+    return portNameSizeN() - 1;
   }
 
   private static native int portNameSizeN();
@@ -481,8 +485,10 @@ public class Jack {
    */
   public int portTypeSize() {
     // subtract one to account for the final NULL character.
-    throw new NotYetImplementedException();
+    return portTypeSizeN() - 1;
   }
+
+  private static native int portTypeSizeN();
 
   // jack.h - line 1265
 

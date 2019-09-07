@@ -26,8 +26,6 @@
 #include "Jack.h"
 
 
-
-
 #ifndef JNI_VERSION_1_2
 #error "Needs Java version 1.2 or higher.\n"
 #endif
@@ -41,10 +39,9 @@ using namespace std;
  * @param level the level as defined in src/3rdparty/spdlog/common.h
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_setLoggingLevelN
-        (JNIEnv *, jclass, jint level){
+        (JNIEnv *, jclass, jint level) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_setLoggingLevelN");
-    switch(level)
-    {
+    switch (level) {
         case jackAudio4Java_Jack_NATIVE_LEVEL_TRACE:
             spdlog::set_level(spdlog::level::trace);
             SPDLOG_INFO("Native Log-level now set to \"trace\"");
@@ -130,8 +127,42 @@ JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_getJackVersionN
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_getJniVersionN
         (JNIEnv *env, jclass) {
-
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_getJniVersionN");
-
     return env->GetVersion();
+}
+
+/**
+ * The maximum number of characters for a port's full name contains the owning client name concatenated
+ * with a colon (`:`) followed by its short name.
+ *
+ * @return the maximum number of characters in a full JACK port name.
+ * This value is a constant.
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portNameSizeN
+        (JNIEnv *, jclass) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portNameSizeN");
+    return jack_port_name_size();
+}
+
+/**
+ * The maximum number of characters in a JACK port type name.
+ *
+ * @return the maximum number of characters in a JACK port type name.
+ * This value is a constant.
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portTypeSizeN
+        (JNIEnv *, jclass){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portTypeSizeN");
+    return jack_port_type_size();
+}
+
+/**
+ * The maximum number of characters in a JACK client name.
+ *
+ * @return the maximum number of characters in a JACK client name. This value is a constant.
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientNameSizeN
+        (JNIEnv *, jclass){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientNameSizeN");
+    return jack_client_name_size();
 }
