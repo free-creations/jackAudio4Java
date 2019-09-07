@@ -42,31 +42,41 @@ using namespace std;
  */
 JNIEXPORT void JNICALL Java_jackAudio4Java_Jack_setLoggingLevelN
         (JNIEnv *, jclass, jint level){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_setLoggingLevelN");
     switch(level)
     {
         case jackAudio4Java_Jack_NATIVE_LEVEL_TRACE:
             spdlog::set_level(spdlog::level::trace);
+            SPDLOG_INFO("Native Log-level now set to \"trace\"");
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_DEBUG:
             spdlog::set_level(spdlog::level::debug);
+            SPDLOG_INFO("Native Log-level now set to \"debug\"");
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_INFO:
             spdlog::set_level(spdlog::level::info);
+            SPDLOG_INFO("Native Log-level now set to \"info\"");
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_WARN:
+            SPDLOG_INFO("Native Log-level now set to \"warn\"");
             spdlog::set_level(spdlog::level::warn);
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_ERROR:
+            SPDLOG_INFO("Native Log-level now set to \"err\"");
             spdlog::set_level(spdlog::level::err);
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_CRITICAL:
+            SPDLOG_INFO("Native Log-level now set to \"critical\"");
             spdlog::set_level(spdlog::level::critical);
             break;
         case jackAudio4Java_Jack_NATIVE_LEVEL_OFF:
+            SPDLOG_INFO("Native Log-level now set to \"off\"");
             spdlog::set_level(spdlog::level::off);
             break;
         default:
+            SPDLOG_INFO("Native Log-level now set to \"trace\"");
             spdlog::set_level(spdlog::level::trace);
+
     }
 }
 
