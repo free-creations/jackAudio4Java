@@ -16,11 +16,8 @@
 package jackAudio4Java.types;
 
 public class OpenStatus {
-  private int statusBits = 0;
+  public int statusBits = 0;
 
-  public OpenStatus(int statusBits) {
-    this.statusBits = statusBits;
-  }
 
   /**
    * Overall operation failed.

@@ -19,9 +19,10 @@ import java.util.Set;
 
 /**
  * The Valid options for opening an external client.
+ *
+ * These are: JackSessionID, JackServerName, JackNoStartServer, JackUseExactName.
  */
 public enum OpenOption {
-
 
   /**
    * Do not automatically start the JACK server when it is not
@@ -38,20 +39,32 @@ public enum OpenOption {
   UseExactName(0x02),
 
   /**
-   * Open with optional `serverName` parameter.
-   * @deprecated this is handled automatically in
-   * {@link jackAudio4Java.Jack#clientOpen(String, Set, OpenStatus, String)} )}
+   * Use the server name given as parameter to select from among several possible concurrent
+   * server instances.
+   * Only if this option is set will the server name be taken into account.
    */
   ServerName(0x04),
+
   /**
    * Pass a SessionID- Token, this allows the session-manager to identify the client again.
    */
   SessionID(0x20);
 
-  OpenOption(int i) {
+  private final int i;
 
+  OpenOption(int i) {
+    this.i = i;
   }
 
+  public int asInt(){
+    return i;
+  }
 
-
+  public static int setToInt(Set<OpenOption> options) {
+    int result = 0;
+    for(OpenOption o: options ){
+      result = result | o.asInt();
+    }
+    return result;
+  }
 }

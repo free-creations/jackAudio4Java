@@ -2,12 +2,18 @@ package jackAudio4Java;
 
 import jackAudio4Java.types.ClientHandle;
 import jackAudio4Java.types.Int;
+import jackAudio4Java.types.OpenOption;
+import jackAudio4Java.types.OpenStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
+import static jackAudio4Java.types.OpenOption.NoStartServer;
+import static jackAudio4Java.types.OpenOption.ServerName;
 
 public class JackTest {
 
@@ -72,6 +78,7 @@ public class JackTest {
     int size = Jack.server().clientNameSize();
     assertThat(size).isAtLeast(8);
   }
+
   /**
    * The function {@link Jack#portNameSize()}
    * shall return a reasonable string size (something larger than 8)
@@ -92,8 +99,6 @@ public class JackTest {
     assertThat(size).isAtLeast(8);
   }
 
-
-
   /**
    * Calling the function {@link Jack#clientClose(ClientHandle)} ()}
    * with an invalid clientHandle should return an error code.
@@ -106,4 +111,25 @@ public class JackTest {
     int error = Jack.server().clientClose(NullClient);
     assertThat(error).isNotEqualTo(0);
   }
+
+  @Test
+  public void ClientOpenClose() throws InterruptedException {
+    Set<OpenOption> openOptions = new HashSet<>();
+    OpenStatus returnStatus = new OpenStatus();
+
+    //openOptions.add(ServerName);
+    //openOptions.add(NoStartServer);
+
+
+    ClientHandle client = Jack.server().clientOpen("JackTest", openOptions, returnStatus, null);
+    assertThat(client).isNotNull();
+
+    assertThat(returnStatus.hasFailure()).isFalse();
+
+    Thread.sleep(500);
+
+    int error = Jack.server().clientClose(client);
+    assertThat(error).isEqualTo(0);
+  }
+
 }

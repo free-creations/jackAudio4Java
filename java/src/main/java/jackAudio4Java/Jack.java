@@ -163,6 +163,7 @@ public class Jack {
    *                     Server names are unique to each user.  If unspecified (i.e. `null`),
    *                     JACK will use a default, unless
    *                     `JACK_DEFAULT_SERVER` is defined in the process environment.
+   *
    * @return an opaque client handle (if successful).  If this is `null`, the
    * open operation failed, the `returnStatus` includes  JackFailure and the
    * caller is not a JACK client.
@@ -171,7 +172,17 @@ public class Jack {
                                  Set<OpenOption> openOptions,
                                  OpenStatus returnStatus,
                                  String serverName) {
-    throw new NotYetImplementedException();
+    int openOptionsN = OpenOption.setToInt(openOptions);
+    Int returnStatusN = new Int();
+
+    long hClient = clientOpenN(clientName, openOptionsN, returnStatusN, serverName);
+
+    if (returnStatus != null) {
+      returnStatus.statusBits = returnStatusN.value;
+    }
+    if (hClient == 0) return null;
+
+    return new InternalClientHandle(hClient);
   }
 
   private native static long clientOpenN(String clientName,
@@ -179,17 +190,7 @@ public class Jack {
                                          Int returnStatus,
                                          String serverName);
 
-  /**
-   * Open an external client session with a JACK server.
-   * <p>
-   * Same as {@link #clientOpen(String, Set, OpenStatus, String)}
-   * except the serverName is left unspecified.
-   */
-  public ClientHandle clientOpen(String clientName,
-                                 Set<OpenOption> options,
-                                 OpenStatus returnStatus) {
-    throw new NotYetImplementedException();
-  }
+
 
 
   // jack.h - line 128
@@ -200,7 +201,8 @@ public class Jack {
    * @return 0 on success, otherwise a non-zero error code
    */
   public int clientClose(ClientHandle client) {
-    InternalClientHandle internalClientHandle = (InternalClientHandle)client;
+    if (client == null) return -1;
+    InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return clientCloseN(internalClientHandle.getReference());
   }
 
