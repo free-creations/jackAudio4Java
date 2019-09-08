@@ -166,3 +166,14 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientNameSizeN
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientNameSizeN");
     return jack_client_name_size();
 }
+
+/**
+ * Disconnects an external client from a JACK server.
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientCloseN
+        (JNIEnv *, jclass, jlong clientHandle){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientCloseN");
+    return jack_client_close ((jack_client_t *)clientHandle);
+}

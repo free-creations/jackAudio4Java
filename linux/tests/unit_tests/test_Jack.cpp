@@ -85,17 +85,36 @@ TEST_F(JackTest, jni_get_version) {
     EXPECT_EQ(version, JNI_VERSION_1_6);
 }
 
+/**
+ * The value returned by Jack_portNameSize should be greater than zero.
+ */
 TEST_F(JackTest, portNameSize) {
     int portNameSize = Java_jackAudio4Java_Jack_portNameSizeN(nullptr, nullptr);
     EXPECT_GT(portNameSize, 0);
 }
 
+/**
+ * The value returned by Jack_portTypeSize should be greater than zero.
+ */
 TEST_F(JackTest, portTypeSize) {
     int portTypeSize = Java_jackAudio4Java_Jack_portTypeSizeN(nullptr, nullptr);
     EXPECT_GT(portTypeSize, 0);
 }
-
+/**
+ * The value returned by Jack_clientNameSize should be greater than zero.
+ */
 TEST_F(JackTest, clientNameSize) {
     int clientNameSize = Java_jackAudio4Java_Jack_clientNameSizeN(nullptr, nullptr);
     EXPECT_GT(clientNameSize, 0);
+}
+
+/**
+ * When attempting to close a NULL client, an error code should be returned.
+ * Note: an attempt to call "clientClose" with any invalid value other than
+ * zero will result in a segment fault!
+ */
+TEST_F(JackTest, clientClose) {
+    long nullClient = 0;
+    int error = Java_jackAudio4Java_Jack_clientCloseN(nullptr, nullptr, nullClient);
+    EXPECT_NE(error, 0);
 }

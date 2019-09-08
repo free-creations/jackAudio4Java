@@ -1,5 +1,6 @@
 package jackAudio4Java;
 
+import jackAudio4Java.types.ClientHandle;
 import jackAudio4Java.types.Int;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,5 +90,20 @@ public class JackTest {
   public void portTypeSize() {
     int size = Jack.server().portTypeSize();
     assertThat(size).isAtLeast(8);
+  }
+
+
+
+  /**
+   * Calling the function {@link Jack#clientClose(ClientHandle)} ()}
+   * with an invalid clientHandle should return an error code.
+   * Unfortunately this works only with a NULL value, any other
+   * invalid value will crash the whole JVM.
+   */
+  @Test
+  public void invalidClientClose() {
+    InternalClientHandle NullClient = new InternalClientHandle(0);
+    int error = Jack.server().clientClose(NullClient);
+    assertThat(error).isNotEqualTo(0);
   }
 }

@@ -88,12 +88,6 @@ public class Jack {
 
   private native static void setLoggingLevelN(int level);
 
-  private static class ReadableClientHandle extends ClientHandle {
-    /**
-     * The native address of this client.
-     */
-    long reference;
-  }
 
   /**
    * Get the version of the _Native Java-method_ interface.
@@ -192,7 +186,7 @@ public class Jack {
    * except the serverName is left unspecified.
    */
   public ClientHandle clientOpen(String clientName,
-                                 OpenOption options,
+                                 Set<OpenOption> options,
                                  OpenStatus returnStatus) {
     throw new NotYetImplementedException();
   }
@@ -206,8 +200,11 @@ public class Jack {
    * @return 0 on success, otherwise a non-zero error code
    */
   public int clientClose(ClientHandle client) {
-    throw new NotYetImplementedException();
+    InternalClientHandle internalClientHandle = (InternalClientHandle)client;
+    return clientCloseN(internalClientHandle.getReference());
   }
+
+  private native static int clientCloseN(long clientHandle);
 
   // jack.h - 136
 

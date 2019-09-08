@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jackAudio4Java.types;
+package jackAudio4Java;
 
-/**
- *  ClientHandle is an opaque type.  It stores a reference to this client.
- */
-public class ClientHandle {
+import jackAudio4Java.types.ClientHandle;
 
-  protected ClientHandle(){}
-  /**
-   * The native address of this client. Only the class InternalClientHandle
-   * defined in {@link jackAudio4Java}
-   * shall have access to this item.
-   */
-  protected long reference;
+
+class InternalClientHandle extends ClientHandle {
+
+  InternalClientHandle(long reference) {
+    this.reference = reference;
+  }
+
+  long getReference() {
+    return reference;
+  }
 }
 
