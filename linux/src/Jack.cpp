@@ -151,7 +151,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portNameSizeN
  * This value is a constant.
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portTypeSizeN
-        (JNIEnv *, jclass){
+        (JNIEnv *, jclass) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_portTypeSizeN");
     return jack_port_type_size();
 }
@@ -162,7 +162,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portTypeSizeN
  * @return the maximum number of characters in a JACK client name. This value is a constant.
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientNameSizeN
-        (JNIEnv *, jclass){
+        (JNIEnv *, jclass) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientNameSizeN");
     return jack_client_name_size();
 }
@@ -173,7 +173,65 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientNameSizeN
  * @return 0 on success, otherwise a non-zero error code
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_clientCloseN
-        (JNIEnv *, jclass, jlong clientHandle){
+        (JNIEnv *, jclass, jlong clientHandle) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientCloseN");
-    return jack_client_close ((jack_client_t *)clientHandle);
+    return jack_client_close((jack_client_t *) clientHandle);
+}
+
+/**
+ * Open an external client session with a JACK server.
+ *
+ * With this interface, clients may choose which of several servers to connect, and control
+ * whether and how to start the server automatically, if it was not
+ * already running.  There is also an option for JACK to generate a
+ * unique client name, when necessary.
+ *
+ * @param clientName   a name for this client.
+ *                     The name scope is local to each server.
+ *                     The name length shall be of at most that given by {@link #clientNameSize()}.
+ *                     The server might modify this name to create a unique variant,
+ *                     unless forbidden by the option {@link OpenOption#UseExactName}
+ *                     set in the `openOptions` parameter.
+ * @param openOptions  a set of options, requesting JACK how to open the client in a specific way.
+ *                     (May be `null`)
+ * @param returnStatus an INT container-object for JACK to return information
+ *                     from the open operation. See {@link OpenStatus}-class.
+ * @param serverName   selects from among several possible concurrent server instances.
+ *                     Server names are unique to each user.  If unspecified (i.e. `null`),
+ *                     JACK will use a default, unless
+ *                     `JACK_DEFAULT_SERVER` is defined in the process environment.
+ * @return an opaque client handle (if successful).  If this is `null`, the
+ * open operation failed, the `returnStatus` includes  JackFailure and the
+ * caller is not a JACK client.
+ */
+JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_clientOpenN
+        (JNIEnv *env, jclass, jstring clientName, jint openOptions, jobject returnStatus, jstring serverName) {
+
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_clientOpenN");
+
+    // transform clientName from Java-string to UTF-8 Native string.
+    const char *clientNameN = nullptr;
+    if (clientName) clientNameN = env->GetStringUTFChars(clientName, nullptr);
+
+    // cast openOptions from "jint" to "jack_options_t" type.
+    auto openOptionsN = (jack_options_t) openOptions;
+
+    // transform serverName from Java-string to UTF-8 Native string.
+    const char *serverNameN = nullptr;
+    if (serverName)serverNameN = env->GetStringUTFChars(serverName, nullptr);
+
+    // allocate space where Jack will write the return status.
+    jack_status_t returnStatusN;
+
+    // and here we go...
+    auto clientHandle = jack_client_open(clientNameN, openOptionsN, &returnStatusN, serverNameN);
+
+    // free resources
+    if (serverNameN) env->ReleaseStringUTFChars(serverName, serverNameN);
+    if (clientNameN) env->ReleaseStringUTFChars(clientName, clientNameN);
+
+    // push the return status into the given container
+    if (returnStatus) types::Int::setValue(env, (types::jIntObject) returnStatus, returnStatusN);
+
+    return (long) clientHandle;
 }

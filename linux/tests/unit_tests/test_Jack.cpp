@@ -113,8 +113,44 @@ TEST_F(JackTest, clientNameSize) {
  * Note: an attempt to call "clientClose" with any invalid value other than
  * zero will result in a segment fault!
  */
-TEST_F(JackTest, clientClose) {
+TEST_F(JackTest, invalidClientClose) {
     long nullClient = 0;
     int error = Java_jackAudio4Java_Jack_clientCloseN(nullptr, nullptr, nullClient);
     EXPECT_NE(error, 0);
+}
+
+
+/**
+ * When attempting to close a NULL client, an error code should be returned.
+ * Note: an attempt to call "clientClose" with any invalid value other than
+ * zero will result in a segment fault!
+ */
+TEST_F(JackTest, clientOpenClose) {
+
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jstring clientName;
+    const char *client_name = "unitTestClient";
+    jint openOptions = 0;
+    jobject returnStatus = nullptr;
+    jstring serverName = nullptr;
+
+    // make the jniEnvMock return a valid c-string for the client name
+    ON_CALL(jniEnvMock, GetStringUTFChars(&clientName, _))
+            .WillByDefault(Return(client_name));
+
+    jlong clientHandle =
+            Java_jackAudio4Java_Jack_clientOpenN(&jniEnvMock,
+                                                 nullptr,
+                                                 &clientName,
+                                                 openOptions,
+                                                 returnStatus,
+                                                 serverName);
+    EXPECT_NE(clientHandle, 0);
+
+    sleep(1);
+
+    int error = Java_jackAudio4Java_Jack_clientCloseN(nullptr, nullptr, clientHandle);
+    EXPECT_EQ(error, 0);
+
+
 }

@@ -160,8 +160,8 @@ public class Jack {
    * @param returnStatus a container-object for JACK to return information
    *                     from the open operation. See {@link OpenStatus}-class.
    * @param serverName   selects from among several possible concurrent server instances.
-   *                     Server names are unique to each user.  If unspecified,
-   *                     JACK will use a default a "default", unless
+   *                     Server names are unique to each user.  If unspecified (i.e. `null`),
+   *                     JACK will use a default, unless
    *                     `JACK_DEFAULT_SERVER` is defined in the process environment.
    * @return an opaque client handle (if successful).  If this is `null`, the
    * open operation failed, the `returnStatus` includes  JackFailure and the

@@ -2,7 +2,7 @@ package jackAudio4Java;
 
 import jackAudio4Java.types.ClientHandle;
 import jackAudio4Java.types.Int;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.logging.Level;
@@ -11,8 +11,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class JackTest {
 
-  @Before
-  public void setUp() {
+  @BeforeClass
+  public static void initialize() {
     Jack.server().setLoggingLevel(Level.ALL);
   }
 
