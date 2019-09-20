@@ -25,22 +25,32 @@ plugins {
 }
 
 ext {
+  buildType = 'Release' // or 'Debug'
+  // the directory where where the C++ compiler shall deliver the native library.
   deliveryDir = file("${buildDir}/out")
+  // the directory where we shall copy the library, so the java build can integrate it into the runtime jar.
   javaResourcesDir = file("${projectDir}/../java/src/main/resources/native/")
 }
 
 cmake {
   sourceFolder = project.projectDir
-  workingFolder = project.buildDir
+  workingFolder = file("${project.buildDir}/${buildType}")
 
-  buildConfig='Release'
+  buildConfig=buildType
 
   def.VERSION=project.version
-  def.LIB_NAME = "${rootProject.name}-${rootProject.version}"
+  def.LIB_NAME =  "${rootProject.name}"
   def.DELIVERIES_DIR = deliveryDir.toString()
   def.WITH_UNIT_TESTS = "OFF"
+  def.CMAKE_BUILD_TYPE = buildType
 }
 
+
+cmakeBuild {
+  dependsOn ':java:compileJava'
+}
+
+// copy the library from here to the Java build.
 tasks.create('copyLib' , Copy) {
   dependsOn cmakeBuild
   from deliveryDir
@@ -55,4 +65,9 @@ cmakeClean {
       include('*.so')
     }
   }
+}
+
+task clean(type: Delete) {
+  dependsOn cmakeClean
+  delete buildDir
 }

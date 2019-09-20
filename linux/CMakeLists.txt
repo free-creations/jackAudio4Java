@@ -21,16 +21,17 @@ cmake_minimum_required(VERSION 3.1)
 
 project(jackAudio4Java)
 
-# the version shall be given on the command line, otherwise we'll use "x.x.x"
+# the version shall be given on the command line (by build.gradle), otherwise we'll use "x.x.x"
 set(VERSION "x.x.x" CACHE STRING "The project version")
 
-# The default library-name shall be the downcased project-name with version appended.
-string( TOLOWER ${CMAKE_PROJECT_NAME}_${VERSION} DEFAULT_LIB_NAME )
+# The default library-name shall be the downcased project-name.
+string( TOLOWER ${CMAKE_PROJECT_NAME} DEFAULT_LIB_NAME )
 
-# the name shall be given on the command line, otherwise we'll use the default name.
+# the library-name shall be given on the command line (by build.gradle), otherwise we'll use the default name.
 set(LIB_NAME ${DEFAULT_LIB_NAME} CACHE STRING "The name (stem) of the library")
 
-# The directory where the final artifacts should be delivered is given on the command line, otherwise we'll use "build/out".
+# The directory where the final artifacts should be delivered shall be given on given on the command line,
+#   otherwise we'll use "build/out".
 set(DELIVERIES_DIR "${PROJECT_BINARY_DIR}/out" CACHE STRING "The directory where the library should be delivered")
 
 # The unit tests take quite long to compile. So we make building with unit-tests an option.
@@ -57,7 +58,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${DELIVERIES_DIR})
 # All project sources reside here.
 add_subdirectory(src)
 
-# Build the unit-tests only in debug mode.
+# Build the unit-tests only if explicitly requested
 IF(${WITH_UNIT_TESTS})
    add_subdirectory(tests)
 ENDIF(${WITH_UNIT_TESTS})

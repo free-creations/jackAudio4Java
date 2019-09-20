@@ -23,7 +23,7 @@ public class NativeManager {
 
   private static final Logger jniLogger = Logger.getLogger(JniLoader.class.getName());
 
-  private static final String libraryName = "libjackAudio4Java-0.1-SNAPSHOT.so";
+  private static final String libraryName = "libjackAudio4Java.so";
   private static volatile boolean libLoaded = false;
   private static final Object loadLock = new Object();
 

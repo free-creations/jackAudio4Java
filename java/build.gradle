@@ -7,10 +7,10 @@ plugins {
   // SpotBugs (former FindBugs) and generates reports from these checks
   id 'com.github.spotbugs' version '2.0.0'
 
-  // Plug-in that computes version information from the SCM.
+  // Plug-in that computes version information from the Git.
   id 'net.nemerosa.versioning' version '2.6.1'
 
-  // The Maven Publish Plugin provides the ability to publish build
+  // The Maven Publish Plugin provides the ability to publish
   // artifacts to an Apache Maven repository.
   id 'maven-publish'
 
@@ -68,6 +68,10 @@ test {
   //jvmArgs "-verbose:jni", "-ea"
 }
 
+// this makes sure that the library is build before the final jar is made.
+processResources{
+  dependsOn ':linux:copyLib'
+}
 
 jar {
 
