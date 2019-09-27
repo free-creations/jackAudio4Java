@@ -12,10 +12,12 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
-import static jackAudio4Java.types.OpenOption.NoStartServer;
-import static jackAudio4Java.types.OpenOption.ServerName;
 
-public class JackTest {
+/**
+ * These unit-tests check whatever can be verified without having an open connection
+ * to the Jack - audio - server.
+ */
+public class JackBasicTest {
 
   @BeforeClass
   public static void initialize() {
@@ -25,7 +27,7 @@ public class JackTest {
   /**
    * The function {@link Jack#getJackVersion(Int, Int, Int, Int)}
    * shall return the version of the jack library.
-   * Note: the version of jack2 installed with
+   * Note: the function `jack_get_version` of jack2 installed with
    * Ubuntu Xenial is broken. It always returns 0,0,0.
    */
   @Test
@@ -112,21 +114,22 @@ public class JackTest {
     assertThat(error).isNotEqualTo(0);
   }
 
+  /**
+   * Check whether it is possible to open - and immediately after - to close a client.
+   * @throws InterruptedException we'll sleep for a short while, an exception should never be thrown.
+   */
   @Test
   public void ClientOpenClose() throws InterruptedException {
     Set<OpenOption> openOptions = new HashSet<>();
     OpenStatus returnStatus = new OpenStatus();
 
-    //openOptions.add(ServerName);
-    //openOptions.add(NoStartServer);
 
-
-    ClientHandle client = Jack.server().clientOpen("JackTest", openOptions, returnStatus, null);
+    ClientHandle client = Jack.server().clientOpen("JackBasicTest", openOptions, returnStatus, null);
     assertThat(client).isNotNull();
 
     assertThat(returnStatus.hasFailure()).isFalse();
 
-    Thread.sleep(500);
+    Thread.sleep(100);
 
     int error = Jack.server().clientClose(client);
     assertThat(error).isEqualTo(0);

@@ -56,10 +56,19 @@ public enum OpenOption {
     this.i = i;
   }
 
+  /**
+   *
+   * @return this option as an Integer value.
+   */
   public int asInt(){
     return i;
   }
 
+  /**
+   * Builds a single Integer resulting by  OR-ing together the integer values of the options in the given set.
+   * @param options a set of open options
+   * @return an Integer resulting by  OR-ing together the integer values of the options in the given set.
+   */
   public static int setToInt(Set<OpenOption> options) {
     int result = 0;
     for(OpenOption o: options ){
