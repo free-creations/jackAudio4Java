@@ -233,5 +233,23 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_clientOpenN
     // push the return status into the given container
     if (returnStatus) types::Int::setValue(env, (types::jIntObject) returnStatus, returnStatusN);
 
-    return (long) clientHandle;
+    return (jlong) clientHandle;
+}
+
+/**
+  * The actual name of this client.
+  *
+  * This is useful when {@link OpenOption#UseExactName}
+  * is not specified on open and {@link OpenStatus#hasNameNotUnique()}
+  * status was returned.  In that case, the actual
+  * name will differ from the `clientName` requested.
+  *
+  * @return the actual client name.
+  */
+JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_getClientNameN
+        (JNIEnv * env, jclass, jlong clientHandle){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_getClientNameN");
+
+    char * clientName = jack_get_client_name ((jack_client_t *) clientHandle);
+    return env->NewStringUTF(clientName);
 }

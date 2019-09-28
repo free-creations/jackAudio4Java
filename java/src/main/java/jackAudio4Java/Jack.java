@@ -234,9 +234,15 @@ public class Jack {
    *
    * @return the actual client name.
    */
-  public String getClientName(ClientHandle clientHandle) {
-    throw new NotYetImplementedException();
+  public String getClientName(ClientHandle client) {
+    if (client == null) return null;
+    InternalClientHandle internalClientHandle = (InternalClientHandle) client;
+    return getClientNameN(internalClientHandle.getReference());
   }
+
+  private native static String getClientNameN(long clientHandle) ;
+
+
 
   // jack.h - 204
 
