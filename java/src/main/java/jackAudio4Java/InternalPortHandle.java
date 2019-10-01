@@ -31,6 +31,9 @@ class InternalPortHandle extends PortHandle {
     return reference;
   }
 
+  /**
+   * Call this function when closing the port.
+   */
   void invalidate() {
     reference = 0;
   }

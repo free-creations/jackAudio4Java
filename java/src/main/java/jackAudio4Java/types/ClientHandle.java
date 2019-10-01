@@ -16,16 +16,28 @@
 package jackAudio4Java.types;
 
 /**
- *  ClientHandle is an opaque type.  It stores a reference to this client.
+ * ClientHandle is an opaque type.  It stores a reference to this client.
  */
 public class ClientHandle {
 
-  protected ClientHandle(){}
+  /**
+   * Client-handles should not be created by any object other than the Jack object.
+   */
+  protected ClientHandle() {
+  }
+
   /**
    * The native address of this client. Only the class InternalClientHandle
-   * defined in {@link jackAudio4Java}
    * shall have access to this item.
    */
   protected long reference;
+
+  /**
+   * A client handle is considered valid, if it is not referencing a null pointer.
+   * @return true if the handle is referencing an existing client.
+   */
+  public boolean isValid() {
+    return (reference != 0);
+  }
 }
 

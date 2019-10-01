@@ -38,8 +38,7 @@ public interface ProcessListener {
    * for more information.
    *
    * @param nframes number of frames to process
-   * @param arg     pointer to a client supplied structure
    * @return zero on success, non-zero on error
    */
-   int onProcess(int nframes, Object arg);
+  int onProcess(int nframes);
 }

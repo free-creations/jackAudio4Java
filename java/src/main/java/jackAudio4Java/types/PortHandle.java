@@ -16,18 +16,26 @@
 package jackAudio4Java.types;
 
 /**
- *  PortHandle is an opaque type.  It stores a reference to a port.
+ * PortHandle is an opaque type.  It stores a reference to a port.
  */
 public class PortHandle {
 
-    protected PortHandle() {
-    }
+  protected PortHandle() {
+  }
 
-    /**
-     * The native address of this client.
-     *
-     * Only the class InternalPortHandle
-     * shall have access to this item.
-     */
-    protected long reference;
+  /**
+   * The native address of this client.
+   * <p>
+   * Only the class InternalPortHandle
+   * shall have access to this item.
+   */
+  protected long reference;
+
+  /**
+   * A port handle is considered valid, if it is not referencing a null pointer.
+   * @return true if the handle is referencing an existing port.
+   */
+  public boolean isValid() {
+    return (reference != 0);
+  }
 }

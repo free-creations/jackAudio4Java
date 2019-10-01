@@ -93,9 +93,9 @@ public class Jack {
    * Get the version of the _Native Java-method_ interface.
    * <p>
    * The major version number is in the higher 16 bits and the minor version number is in the lower 16 bits.
-   *
+   * <p>
    * At the time of writing, the following constants were defined:
-   *
+   * <p>
    * - `JNI_VERSION_1_1 0x00010001`
    * - `JNI_VERSION_1_2 0x00010002`
    * - `JNI_VERSION_1_4 0x00010004`
@@ -126,24 +126,24 @@ public class Jack {
    * @param protoRef Integer- container receiving protocol version of JACK.
    */
   public void getJackVersion(
-      Int majorRef,
-      Int minorRef,
-      Int microRef,
-      Int protoRef) {
+          Int majorRef,
+          Int minorRef,
+          Int microRef,
+          Int protoRef) {
     getJackVersionN(majorRef, minorRef, microRef, protoRef);
   }
 
   private native static void getJackVersionN(
-      Int majorRef,
-      Int minorRef,
-      Int microRef,
-      Int protoRef);
+          Int majorRef,
+          Int minorRef,
+          Int microRef,
+          Int protoRef);
 
   // jack.h - line 83
 
   /**
    * Open an external client session with a JACK server.
-   *
+   * <p>
    * With this interface, clients may choose which of several servers to connect, and control
    * whether and how to start the server automatically, if it was not
    * already running.  There is also an option for JACK to generate a
@@ -163,16 +163,15 @@ public class Jack {
    *                     Server names are unique to each user.  If unspecified (i.e. `null`),
    *                     JACK will use a default, unless
    *                     `JACK_DEFAULT_SERVER` is defined in the process environment.
-   *
    * @return an opaque client handle (if successful).  If this is `null`, the
    * open operation failed, the `returnStatus` includes  JackFailure and the
    * caller is not a JACK client.
    */
   public ClientHandle clientOpen(String clientName,
-                                 Set<OpenOption> openOptions,
+                                 OpenOption[] openOptions,
                                  OpenStatus returnStatus,
                                  String serverName) {
-    int openOptionsN = OpenOption.setToInt(openOptions);
+    int openOptionsN = OpenOption.arrayToInt(openOptions);
     Int returnStatusN = new Int();
 
     long hClient = clientOpenN(clientName, openOptionsN, returnStatusN, serverName);
@@ -191,8 +190,6 @@ public class Jack {
                                          String serverName);
 
 
-
-
   // jack.h - line 128
 
   /**
@@ -202,8 +199,11 @@ public class Jack {
    */
   public int clientClose(ClientHandle client) {
     if (client == null) return -1;
+    if (!client.isValid()) return -1;
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
-    return clientCloseN(internalClientHandle.getReference());
+    int error = clientCloseN(internalClientHandle.getReference());
+    internalClientHandle.invalidate();
+    return error;
   }
 
   private native static int clientCloseN(long clientHandle);
@@ -226,7 +226,7 @@ public class Jack {
 
   /**
    * The actual name of this client.
-   *
+   * <p>
    * This is useful when {@link OpenOption#UseExactName}
    * is not specified on open and {@link OpenStatus#hasNameNotUnique()}
    * status was returned.  In that case, the actual
@@ -240,8 +240,7 @@ public class Jack {
     return getClientNameN(internalClientHandle.getReference());
   }
 
-  private native static String getClientNameN(long clientHandle) ;
-
+  private native static String getClientNameN(long clientHandle);
 
 
   // jack.h - 204
@@ -302,43 +301,45 @@ public class Jack {
   // jack.h line 377
 
   /**
-   * Tell the Jack server to call {@link ProcessListener#onProcess(int, Object)}
+   * Tell the Jack server to call {@link ProcessListener#onProcess(int)}
    * whenever there is work be done.
-   *
+   * <p>
    * The parameter `arg` will be passed
    * as second argument (mind the risk of race conditions and make `arg` immutable).
-   *
+   * <p>
    * NOTE: this function cannot be called while the client is active
    * (after {@link #activate(ClientHandle)} has been called.)
    *
    * @param client          an opaque handle representing this client.
    * @param processListener the listener that will be called for each process cycle.
-   * @param arg             an arbitrary (preferably immutable ) object
-   *                        that will handed to the processListener on each process cycle.
    * @return 0 on success, otherwise a non-zero error code.
    */
   public int registerProcessListener(ClientHandle client,
-                                     ProcessListener processListener,
-                                     Object arg) {
-    throw new NotYetImplementedException();
+                                     ProcessListener processListener) {
+    if (client == null) return -1;
+    if (!client.isValid()) return -1;
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+    return registerProcessListenerN(clientHandleN, processListener);
   }
+
+  private native static int registerProcessListenerN(long client, ProcessListener processListener);
 
   // jack.h - line 711
 
   /**
    * Create a new port for the client.
-   *
+   * <p>
    * This is an object used for moving data of any type in or out of the client.
    * Ports may be connected in various ways.
-   *
+   * <p>
    * Each port has a _short name_.  The port's _full name_ contains the name
    * of the client concatenated with a colon (:) followed by its _short name_.
    * The {@link #portNameSize()} is the maximum length of this _full name_.
    * Exceeding that will cause the port registration to fail and return `null`.
-   *
+   * <p>
    * The `portName` must be unique among all ports owned by this client.
    * If the name is not unique, the registration will fail.
-   *
+   * <p>
    * All ports have a _type_, defined by the parameter `portType`.
    *
    * @param client     an opaque handle representing this client.
@@ -358,7 +359,7 @@ public class Jack {
     long portFlagsN = PortFlag.arrayToLong(portFlags);
     long clientHandleN = ((InternalClientHandle) client).getReference();
 
-    long portHandleN = portRegisterN(clientHandleN, portName, portType.toString(), portFlagsN,bufferSize);
+    long portHandleN = portRegisterN(clientHandleN, portName, portType.toString(), portFlagsN, bufferSize);
 
     if (portHandleN == 0) {
       return null;
@@ -372,35 +373,38 @@ public class Jack {
                                            long flags,
                                            long bufferSize);
   // jack.h -line 747
+
   /**
    * Remove the port from the client, disconnecting any existing
    * connections.
    *
    * @param client an opaque handle representing this client.
-   * @param port an opaque handle representing the port.
+   * @param port   an opaque handle representing the port.
    * @return 0 on success, otherwise a non-zero error code
    */
-  public int portUnregister (ClientHandle client, PortHandle port) {
+  public int portUnregister(ClientHandle client, PortHandle port) {
     if (client == null) return -1;
+    if (!client.isValid()) return -1;
     if (port == null) return -1;
+    if (!port.isValid()) return -1;
+
     long clientHandleN = ((InternalClientHandle) client).getReference();
-    if (clientHandleN == 0) return -1;
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     long portHandleN = internalPortHandle.getReference();
-    if (portHandleN == 0) return -1;
 
-    int result = portUnregisterN(clientHandleN, portHandleN);
+
+    int error = portUnregisterN(clientHandleN, portHandleN);
     internalPortHandle.invalidate();
-    return result;
+    return error;
   }
 
-  private native static int portUnregisterN (long client, long port);
+  private native static int portUnregisterN(long client, long port);
 
   // jack.h -line 944
 
   /**
    * Switch input monitoring on or off.
-   *
+   * <p>
    * If  {@link PortFlag#canMonitor}  is set for this _port_, turn input
    * monitoring on or off.  Otherwise, do nothing.
    *
@@ -422,7 +426,7 @@ public class Jack {
    * containing the data from the port's connection(s), or
    * zero-filled. if there are multiple inbound connections, the data
    * will be mixed appropriately.
-   *
+   * <p>
    * FOR OUTPUT PORTS ONLY : DEPRECATED in Jack 2.0 !!
    * ---------------------------------------------------
    * You may cache the value returned, but only between calls to
@@ -440,7 +444,7 @@ public class Jack {
 
   /**
    * Receive audio data from an input port.
-   *
+   * <p>
    * The port must have been created with the flag {@link PortFlag#isInput}.
    *
    * @param inputPort      an opaque handle representing a inputPort.
@@ -453,7 +457,7 @@ public class Jack {
 
   /**
    * Send data over an output port.
-   *
+   * <p>
    * The port must have been created with the flag {@link PortFlag#isOutput}.
    *
    * @param outputPort an opaque handle representing a outputPort.
@@ -481,10 +485,10 @@ public class Jack {
 
   /**
    * Establish a connection between two ports.
-   *
+   * <p>
    * When a connection exists, data written to the __source port__ will
    * be available to be read at the __destination port__.
-   *
+   * <p>
    * - The _port-types_ must be identical.
    * - The  {@link PortFlag} of the __source_port__ must include {@link PortFlag#isOutput}.
    * - The  {@link PortFlag}  of the __destination_port__ must include {@link PortFlag#isInput}.

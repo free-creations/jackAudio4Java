@@ -18,24 +18,21 @@ package jackAudio4Java;
 /**
  * Thrown to indicate that a block of code has not been implemented.
  */
-public class NotYetImplementedException extends UnsupportedOperationException
-{
+public class NotYetImplementedException extends UnsupportedOperationException {
   /**
    * @deprecated Deprecated to remind me to implement the corresponding code
-   *             before releasing the software.
+   * before releasing the software.
    */
   @Deprecated
-  public NotYetImplementedException()
-  {
+  public NotYetImplementedException() {
   }
 
   /**
    * @deprecated Deprecated to remind me to implement the corresponding code
-   *             before releasing the software.
+   * before releasing the software.
    */
   @Deprecated
-  public NotYetImplementedException(String message)
-  {
+  public NotYetImplementedException(String message) {
     super(message);
   }
 }

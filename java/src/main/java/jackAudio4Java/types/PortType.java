@@ -4,10 +4,10 @@ import jackAudio4Java.Jack;
 
 /**
  * An Enum like data structure for describing _port types_.
- *
+ * <p>
  * Currently predefined _port types_ for _Audio_ and _Midi_
  * are built into the JACK API.
- *
+ * <p>
  * Only ports of the same type can be connected.
  */
 public class PortType {
@@ -38,7 +38,7 @@ public class PortType {
 
   /**
    * Use `PortType.custom(portTypeName)` to describe a customer supplied port type.
-   *
+   * <p>
    * Note: because of this custom type we cannot define a regular java Enum here.
    *
    * @param portTypeName The name of this port Type. The {@link   Jack#portTypeSize()} is

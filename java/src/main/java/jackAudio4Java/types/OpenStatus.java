@@ -36,7 +36,7 @@ public class OpenStatus {
   /**
    * The desired client name was not unique.  With the
    * {@link OpenOption#UseExactName }
-   *  option this situation is fatal.  Otherwise,
+   * option this situation is fatal.  Otherwise,
    * the name was modified by appending a dash and a two-digit
    * number in the range "-01" to "-99".  The
    * jack_get_client_name() function will return the exact string

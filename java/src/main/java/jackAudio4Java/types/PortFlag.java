@@ -40,13 +40,13 @@ public enum PortFlag {
   /**
    * If the `canMonitor` flag is set, then a call to
    * {@link jackAudio4Java.Jack#portRequestMonitor(PortHandle, boolean)} makes sense.
-   *
+   * <p>
    * Precisely what this means is dependent on the client. A typical
    * result of it being called with TRUE as the second argument is
    * that data that would be available from an output port (with
    * {@link PortFlag#isPhysical} set) is sent to a physical output connector
    * as well, so that it can be heard/seen/whatever.
-   *
+   * <p>
    * Clients that do not control physical interfaces
    * should never create ports with this bit set.
    */
@@ -54,13 +54,13 @@ public enum PortFlag {
 
   /**
    * isTerminal means that the port is at the boundary to the outside world.
-   *
+   * <p>
    * - for an __input port__: the data received by the port
-   *   will not be passed on or made
-   *   available at any other port
+   * will not be passed on or made
+   * available at any other port
    * - for an __output port__: the data available at the port
-   *   does not originate from any other port
-   *
+   * does not originate from any other port
+   * <p>
    * Audio synthesizers, I/O hardware interface clients, HDR
    * systems are examples of clients that would set this flag for
    * their ports.
@@ -79,12 +79,13 @@ public enum PortFlag {
 
   /**
    * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   *
    * @param flags a set of port flags
    * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
    */
   public static long setToLong(Set<PortFlag> flags) {
     long result = 0;
-    for(PortFlag flag: flags ){
+    for (PortFlag flag : flags) {
       result = result | flag.getBits();
     }
     return result;
@@ -92,12 +93,14 @@ public enum PortFlag {
 
   /**
    * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   *
    * @param flags a set of port flags
    * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
    */
   public static long arrayToLong(PortFlag[] flags) {
+    if(flags == null) return 0;
     long result = 0;
-    for(PortFlag flag: flags ){
+    for (PortFlag flag : flags) {
       result = result | flag.getBits();
     }
     return result;

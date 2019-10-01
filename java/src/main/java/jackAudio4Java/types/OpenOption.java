@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * The Valid options for opening an external client.
- *
+ * <p>
  * These are: JackSessionID, JackServerName, JackNoStartServer, JackUseExactName.
  */
 public enum OpenOption {
@@ -56,24 +56,42 @@ public enum OpenOption {
     this.i = i;
   }
 
+
   /**
-   *
    * @return this option as an Integer value.
    */
-  public int asInt(){
+  public int asInt() {
     return i;
   }
 
   /**
    * Builds a single Integer resulting by  OR-ing together the integer values of the options in the given set.
+   *
    * @param options a set of open options
    * @return an Integer resulting by  OR-ing together the integer values of the options in the given set.
    */
   public static int setToInt(Set<OpenOption> options) {
     int result = 0;
-    for(OpenOption o: options ){
+    for (OpenOption o : options) {
       result = result | o.asInt();
     }
     return result;
   }
+
+  /**
+   * Builds a single Integer resulting by  OR-ing together the integer values of the options in the given set.
+   *
+   * @param options a set of open options
+   * @return an Integer resulting by  OR-ing together the integer values of the options in the given set.
+   */
+  public static int arrayToInt(OpenOption[] options) {
+    if(options == null) return 0;
+    int result = 0;
+    for (OpenOption o : options) {
+      result = result | o.asInt();
+    }
+    return result;
+  }
+
+
 }

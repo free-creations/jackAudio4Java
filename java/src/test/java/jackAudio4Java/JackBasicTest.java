@@ -120,12 +120,13 @@ public class JackBasicTest {
    */
   @Test
   public void ClientOpenClose() throws InterruptedException {
-    Set<OpenOption> openOptions = new HashSet<>();
+
+
     OpenStatus returnStatus = new OpenStatus();
 
-
-    ClientHandle client = Jack.server().clientOpen("JackBasicTest", openOptions, returnStatus, null);
+    ClientHandle client = Jack.server().clientOpen("JackBasicTest", new OpenOption[]{}, returnStatus, null);
     assertThat(client).isNotNull();
+    assertThat(client.isValid()).isTrue();
 
     assertThat(returnStatus.hasFailure()).isFalse();
 
@@ -133,6 +134,7 @@ public class JackBasicTest {
 
     int error = Jack.server().clientClose(client);
     assertThat(error).isEqualTo(0);
+    assertThat(client.isValid()).isFalse();
   }
 
 }

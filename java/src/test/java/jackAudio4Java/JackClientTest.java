@@ -17,48 +17,55 @@ import static com.google.common.truth.Truth.assertThat;
  * client handle.
  */
 public class JackClientTest {
-    private static ClientHandle client;
-    private static final String clientName = "JackClientÜÄÖéè";
+  private static ClientHandle client;
+  private static final String clientName = "JackClientÜÄÖéè";
 
-    @BeforeClass
-    public static void initialize() {
-        Jack.server().setLoggingLevel(Level.ALL);
+  /**
+   * Initialize the tests and register a new client with the jack server.
+   */
+  @BeforeClass
+  public static void initialize() {
+    Jack.server().setLoggingLevel(Level.ALL);
 
-        Set<OpenOption> openOptions = new HashSet<>();
-        OpenStatus returnStatus = new OpenStatus();
-        client = Jack.server().clientOpen(clientName, openOptions, returnStatus, null);
-        assertThat(client).isNotNull();
+    OpenStatus returnStatus = new OpenStatus();
+    client = Jack.server().clientOpen(clientName, null, returnStatus, null);
+    assertThat(client).isNotNull();
 
-        assertThat(returnStatus.hasFailure()).isFalse();
-    }
+    assertThat(returnStatus.hasFailure()).isFalse();
+  }
 
-    @AfterClass
-    public static void shutdown() {
-        int error = Jack.server().clientClose(client);
-        assertThat(error).isEqualTo(0);
-    }
+  /**
+   * Shut down the tests and close the client.
+   */
+  @AfterClass
+  public static void shutdown() {
+    int error = Jack.server().clientClose(client);
+    assertThat(error).isEqualTo(0);
+  }
 
 
-    /**
-     * Check that `getClientName` returns the name given in above initialize() method.
-     */
-    @Test
-    public void getClientName() {
-        assertThat(Jack.server().getClientName(client)).isEqualTo(clientName);
-    }
+  /**
+   * The function `Jack.getClientName` shall return the name given in above initialize() method.
+   */
+  @Test
+  public void getClientName() {
+    assertThat(Jack.server().getClientName(client)).isEqualTo(clientName);
+  }
 
-    /**
-     * A client can register and unregister a port.
-     */
-    @Test
-    public void portRegisterUnregister() {
-        final String portName = "newPort";
-        PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(),new PortFlag[]{PortFlag.isInput},0);
-        assertThat(port).isNotNull();
+  /**
+   * A client shall be able to register and unregister a port.
+   */
+  @Test
+  public void portRegisterUnregister() {
+    final String portName = "testPort";
+    PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(), new PortFlag[]{PortFlag.isInput}, 0);
+    assertThat(port).isNotNull();
+    assertThat(port.isValid()).isTrue();
 
-        int error = Jack.server().portUnregister (client, port);
-        assertThat(error).isEqualTo(0);
-     }
+    int error = Jack.server().portUnregister(client, port);
+    assertThat(error).isEqualTo(0);
+    assertThat(port.isValid()).isFalse();
+  }
 
 
 }

@@ -29,5 +29,12 @@ class InternalClientHandle extends ClientHandle {
   long getReference() {
     return reference;
   }
+
+  /**
+   * Call this function when closing the client.
+   */
+  void invalidate() {
+    reference = 0;
+  }
 }
 
