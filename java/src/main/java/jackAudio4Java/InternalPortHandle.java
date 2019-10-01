@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jackAudio4Java.types;
+package jackAudio4Java;
+
+
+import jackAudio4Java.types.PortHandle;
 
 /**
- *  PortHandle is an opaque type.  It stores a reference to a port.
+ * Instances of this class shall not be created by any object other than {@link Jack}.
  */
-public class PortHandle {
+class InternalPortHandle extends PortHandle {
 
-    protected PortHandle() {
-    }
+  InternalPortHandle(long reference) {
+    this.reference = reference;
+  }
 
-    /**
-     * The native address of this client.
-     *
-     * Only the class InternalPortHandle
-     * shall have access to this item.
-     */
-    protected long reference;
+  long getReference() {
+    return reference;
+  }
+
+  void invalidate() {
+    reference = 0;
+  }
 }
+

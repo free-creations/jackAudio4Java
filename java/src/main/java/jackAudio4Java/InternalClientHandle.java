@@ -17,7 +17,9 @@ package jackAudio4Java;
 
 import jackAudio4Java.types.ClientHandle;
 
-
+/**
+ * Instances of this class shall not be created by any object other than {@link Jack}.
+ */
 class InternalClientHandle extends ClientHandle {
 
   InternalClientHandle(long reference) {

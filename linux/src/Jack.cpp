@@ -247,9 +247,73 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_clientOpenN
   * @return the actual client name.
   */
 JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_getClientNameN
-        (JNIEnv * env, jclass, jlong clientHandle){
+        (JNIEnv *env, jclass, jlong clientHandle) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_getClientNameN");
 
-    char * clientName = jack_get_client_name ((jack_client_t *) clientHandle);
+    char *clientName = jack_get_client_name((jack_client_t *) clientHandle);
     return env->NewStringUTF(clientName);
+}
+
+
+/**
+ * Create a new port for the client.
+ *
+ * This is an object used for moving data of any type in or out of the client.
+ * Ports may be connected in various ways.
+ *
+ * Each port has a _short name_.  The port's _full name_ contains the name
+ * of the client concatenated with a colon (:) followed by its _short name_.
+ * The {@link #portNameSize()} is the maximum length of this _full name_.
+ * Exceeding that will cause the port registration to fail and return `null`.
+ *
+ * The `portName` must be unique among all ports owned by this client.
+ * If the name is not unique, the registration will fail.
+ *
+ * All ports have a _type_, defined by the parameter `portType`.
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    portRegisterN
+ * Signature: (JLjava/lang/String;Ljava/lang/String;JJ)J
+ *
+ * @param client     an opaque handle representing this client.
+ * @param portName   non-empty _short name_ for the new port (shall not
+ *                   include the leading `client_name:`). Must be unique.
+ * @param portType   the port-type.  See {@link PortType}
+ * @param portFlags  an array of flags see:  {@link PortFlag}.
+ * @param bufferSize must be non-zero if this is not a built-in
+ *                   port type (see {@link PortType}).  Otherwise, it is ignored.
+ * @return a port handle on success, otherwise `null`.
+ */
+JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
+        (JNIEnv * env, jclass, jlong client, jstring portName, jstring portType, jlong portFlags, jlong bufferSize) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portRegisterN");
+
+    // transform portName and portType from Java-string to UTF-8 Native string.
+    const char *portNameN = nullptr;
+    if (portName) portNameN = env->GetStringUTFChars(portName, nullptr);
+    const char *portTypeN = nullptr;
+    if (portType) portTypeN = env->GetStringUTFChars(portType, nullptr);
+
+    // and here we go...
+    auto portHandle = jack_port_register ((jack_client_t *)client, portNameN, portTypeN, portFlags, bufferSize);
+
+    return (jlong) portHandle;
+}
+
+/**
+ * Remove the port from the client, disconnecting any existing
+ * connections.
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    portUnregisterN
+ * Signature: (JJ)I
+ * 
+ * @param client an opaque handle representing this client.
+ * @param port an opaque handle representing the port.
+ * @return 0 on success, otherwise a non-zero error code
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portUnregisterN
+        (JNIEnv *, jclass, jlong client, jlong port) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portUnregisterN");
+    return jack_port_unregister((jack_client_t *) client, (jack_port_t *) port);
 }

@@ -345,30 +345,63 @@ public class Jack {
    * @param portName   non-empty _short name_ for the new port (shall not
    *                   include the leading `client_name:`). Must be unique.
    * @param portType   the port-type.  See {@link PortType}
-   * @param flags      a set of {@link PortFlags}.
+   * @param portFlags  an array of flags see:  {@link PortFlag}.
    * @param bufferSize must be non-zero if this is not a built-in
    *                   port type (see {@link PortType}).  Otherwise, it is ignored.
    * @return a port handle on success, otherwise `null`.
    */
-  public PortHandle registerPort(ClientHandle client,
+  public PortHandle portRegister(ClientHandle client,
                                  String portName,
                                  PortType portType,
-                                 Set<PortFlags> flags,
+                                 PortFlag[] portFlags,
                                  long bufferSize) {
-    throw new NotYetImplementedException();
+    long portFlagsN = PortFlag.arrayToLong(portFlags);
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+
+    long portHandleN = portRegisterN(clientHandleN, portName, portType.toString(), portFlagsN,bufferSize);
+
+    if (portHandleN == 0) {
+      return null;
+    }
+    return new InternalPortHandle(portHandleN);
   }
 
-  private native static long registerPortN(long client,
+  private native static long portRegisterN(long client,
                                            String portName,
                                            String portType,
                                            long flags,
                                            long bufferSize);
+  // jack.h -line 747
+  /**
+   * Remove the port from the client, disconnecting any existing
+   * connections.
+   *
+   * @param client an opaque handle representing this client.
+   * @param port an opaque handle representing the port.
+   * @return 0 on success, otherwise a non-zero error code
+   */
+  public int portUnregister (ClientHandle client, PortHandle port) {
+    if (client == null) return -1;
+    if (port == null) return -1;
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+    if (clientHandleN == 0) return -1;
+    InternalPortHandle internalPortHandle = (InternalPortHandle) port;
+    long portHandleN = internalPortHandle.getReference();
+    if (portHandleN == 0) return -1;
+
+    int result = portUnregisterN(clientHandleN, portHandleN);
+    internalPortHandle.invalidate();
+    return result;
+  }
+
+  private native static int portUnregisterN (long client, long port);
+
   // jack.h -line 944
 
   /**
    * Switch input monitoring on or off.
    *
-   * If  {@link PortFlags#canMonitor}  is set for this _port_, turn input
+   * If  {@link PortFlag#canMonitor}  is set for this _port_, turn input
    * monitoring on or off.  Otherwise, do nothing.
    *
    * @param portHandle an opaque handle representing a port.
@@ -408,7 +441,7 @@ public class Jack {
   /**
    * Receive audio data from an input port.
    *
-   * The port must have been created with the flag {@link PortFlags#isInput}.
+   * The port must have been created with the flag {@link PortFlag#isInput}.
    *
    * @param inputPort      an opaque handle representing a inputPort.
    * @param inputContainer a client supplied container that will be filled with the received data.
@@ -421,7 +454,7 @@ public class Jack {
   /**
    * Send data over an output port.
    *
-   * The port must have been created with the flag {@link PortFlags#isOutput}.
+   * The port must have been created with the flag {@link PortFlag#isOutput}.
    *
    * @param outputPort an opaque handle representing a outputPort.
    * @param output     a container for data that shall be send over this outputPort.
@@ -453,8 +486,8 @@ public class Jack {
    * be available to be read at the __destination port__.
    *
    * - The _port-types_ must be identical.
-   * - The  {@link PortFlags} of the __source_port__ must include {@link PortFlags#isOutput}.
-   * - The  {@link PortFlags}  of the __destination_port__ must include {@link PortFlags#isInput}.
+   * - The  {@link PortFlag} of the __source_port__ must include {@link PortFlag#isOutput}.
+   * - The  {@link PortFlag}  of the __destination_port__ must include {@link PortFlag#isInput}.
    *
    * @return 0 on success, EEXIST if the connection is already made,
    * otherwise a non-zero error code

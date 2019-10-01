@@ -39,6 +39,8 @@ public class PortType {
   /**
    * Use `PortType.custom(portTypeName)` to describe a customer supplied port type.
    *
+   * Note: because of this custom type we cannot define a regular java Enum here.
+   *
    * @param portTypeName The name of this port Type. The {@link   Jack#portTypeSize()} is
    *                     the maximum length of this full name.  Exceeding that will cause the port
    *                     registration to fail.

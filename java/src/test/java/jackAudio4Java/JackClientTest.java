@@ -1,9 +1,6 @@
 package jackAudio4Java;
 
-import jackAudio4Java.types.ClientHandle;
-import jackAudio4Java.types.Int;
-import jackAudio4Java.types.OpenOption;
-import jackAudio4Java.types.OpenStatus;
+import jackAudio4Java.types.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,11 +13,12 @@ import static com.google.common.truth.Truth.assertThat;
 
 /**
  * These unit-tests check the functions that need an open connection to the
- * the Jack - audio - server.
+ * the Jack - audio - server. Or in other words, checks that need valid
+ * client handle.
  */
 public class JackClientTest {
     private static ClientHandle client;
-    private static final String clientName = "JackClientTest";
+    private static final String clientName = "JackClientÜÄÖéè";
 
     @BeforeClass
     public static void initialize() {
@@ -41,12 +39,26 @@ public class JackClientTest {
     }
 
 
-  /**
-   * Check that `getClientName` returns the name given in above initialize() method.
-   */
-  @Test
+    /**
+     * Check that `getClientName` returns the name given in above initialize() method.
+     */
+    @Test
     public void getClientName() {
         assertThat(Jack.server().getClientName(client)).isEqualTo(clientName);
     }
+
+    /**
+     * A client can register and unregister a port.
+     */
+    @Test
+    public void portRegisterUnregister() {
+        final String portName = "newPort";
+        PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(),new PortFlag[]{PortFlag.isInput},0);
+        assertThat(port).isNotNull();
+
+        int error = Jack.server().portUnregister (client, port);
+        assertThat(error).isEqualTo(0);
+     }
+
 
 }

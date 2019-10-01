@@ -15,7 +15,9 @@
  */
 package jackAudio4Java.types;
 
-public enum PortFlags {
+import java.util.Set;
+
+public enum PortFlag {
 
   /**
    * if `isInput` is set, then the port can receive
@@ -42,7 +44,7 @@ public enum PortFlags {
    * Precisely what this means is dependent on the client. A typical
    * result of it being called with TRUE as the second argument is
    * that data that would be available from an output port (with
-   * {@link PortFlags#isPhysical} set) is sent to a physical output connector
+   * {@link PortFlag#isPhysical} set) is sent to a physical output connector
    * as well, so that it can be heard/seen/whatever.
    *
    * Clients that do not control physical interfaces
@@ -67,11 +69,37 @@ public enum PortFlags {
 
   private final long bits;
 
-  PortFlags(long bits) {
+  PortFlag(long bits) {
     this.bits = bits;
   }
 
   public long getBits() {
     return bits;
+  }
+
+  /**
+   * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   * @param flags a set of port flags
+   * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   */
+  public static long setToLong(Set<PortFlag> flags) {
+    long result = 0;
+    for(PortFlag flag: flags ){
+      result = result | flag.getBits();
+    }
+    return result;
+  }
+
+  /**
+   * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   * @param flags a set of port flags
+   * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   */
+  public static long arrayToLong(PortFlag[] flags) {
+    long result = 0;
+    for(PortFlag flag: flags ){
+      result = result | flag.getBits();
+    }
+    return result;
   }
 }

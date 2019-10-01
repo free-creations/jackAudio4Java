@@ -58,9 +58,9 @@ protected:
     }
 
     void TearDown() override {
-        int failure = jack_client_close((jack_client_t *)clientHandle);
+        int failure = jack_client_close((jack_client_t *) clientHandle);
 
-        if (failure ) {
+        if (failure) {
             throw std::runtime_error("Failed to close Jack Client.");
         } else {
             SPDLOG_TRACE("Jack client closed.");
@@ -69,21 +69,58 @@ protected:
 };
 
 /**
- * Function `Server::jack_get_version` shall push the _jack library_ version into the
- * `Int` objects provided by the caller.
+ * Function `Java_jackAudio4Java_Jack_getClientNameN` shall return the client name given
+ * in above  SetUp() method.
  */
-TEST_F(JackTestClient, jack_getClientName) {
+TEST_F(JackTestClient, getClientName) {
 
 
     NiceMock<JNIEnvMock> jniEnvMock;
-
-
-
     // Verify that the client name is what we have set in the "SetUp".
     EXPECT_CALL(jniEnvMock, NewStringUTF(StrEq(client_name)))
             .Times(1);
 
     // here we go...
-    jstring clientNameJava =  Java_jackAudio4Java_Jack_getClientNameN (&jniEnvMock, nullptr, clientHandle);
+    jstring clientNameJava = Java_jackAudio4Java_Jack_getClientNameN(&jniEnvMock, nullptr, clientHandle);
+}
 
+
+
+
+/**
+ * A client can register and unregister a port.
+ */
+TEST_F(JackTestClient, portRegister_Unregister) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+
+    _jstring portNameJ; // the "java version" of the port name.
+    const char *portNameN = "InputPort"; // the "native version" of the port name.
+
+    _jstring portType; // the "java version" of the port type.
+    const char *portTypeN = JACK_DEFAULT_AUDIO_TYPE; // the "native version" of the port type.
+
+    jlong portFlags = JackPortIsInput;
+    jlong bufferSize = 0;
+
+    // make the jniEnvMock return portNameN for portNameJ
+    ON_CALL(jniEnvMock, GetStringUTFChars(&portNameJ, nullptr))
+            .WillByDefault(Return(portNameN));
+
+    // make the jniEnvMock return portTypeN for portTypeJ
+    ON_CALL(jniEnvMock, GetStringUTFChars(&portType, nullptr))
+            .WillByDefault(Return(portTypeN));
+
+    // here we go...
+    auto portHandle = Java_jackAudio4Java_Jack_portRegisterN(&jniEnvMock,
+                                                             nullptr,
+                                                             clientHandle,
+                                                             &portNameJ,
+                                                             &portType,
+                                                             portFlags,
+                                                             bufferSize);
+    EXPECT_NE(portHandle, 0);
+
+    // ... and remove this port again.
+    auto error  =Java_jackAudio4Java_Jack_portUnregisterN(&jniEnvMock,nullptr,clientHandle,portHandle);
+    EXPECT_EQ(error, 0);
 }
