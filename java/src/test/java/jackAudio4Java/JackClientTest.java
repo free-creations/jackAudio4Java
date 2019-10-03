@@ -5,8 +5,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -67,5 +65,43 @@ public class JackClientTest {
     assertThat(port.isValid()).isFalse();
   }
 
+  /**
+   * A client can be activated and can can be deactivated.
+   */
+  @Test
+  public void activateDeactivate() {
+    int error;
+    error = Jack.server().activate(client);
+    assertThat(error).isEqualTo(0);
 
+    error = Jack.server().deactivate(client);
+    assertThat(error).isEqualTo(0);
+
+  }
+
+  /**
+   * A client shall be able to register a ProcessListener.
+   */
+  @Test
+  public void registerProcessListener() {
+    TestProcessListener testProcessListener = new TestProcessListener();
+    // when registering a valid ProcessListener, the error-code shall be zero
+    int error = Jack.server().registerProcessListener(client, testProcessListener);
+    assertThat(error).isEqualTo(0);
+
+    // when registering Null as ProcessListener, the error-code shall be minus one.
+    error = Jack.server().registerProcessListener(client, null);
+    assertThat(error).isEqualTo(-1);
+  }
+
+
+  private static class TestProcessListener implements ProcessListener {
+    long count = 0;
+
+    @Override
+    public int onProcess(int nframes) {
+      count++;
+      return 0;
+    }
+  }
 }

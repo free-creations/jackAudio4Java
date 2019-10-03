@@ -36,6 +36,12 @@ using testing::StrEq;
 
 using namespace jnimock;
 
+struct _jmethodID {
+    // jni.h only defines a forward reference.
+    // We complete the definition with an empty struct here.
+    // This will enable us to create empty objects of type _jmethodID.
+};
+
 class JackTestClient : public ::testing::Test {
 protected:
     const char *client_name = "Nervensäge";
@@ -121,6 +127,34 @@ TEST_F(JackTestClient, portRegister_Unregister) {
     EXPECT_NE(portHandle, 0);
 
     // ... and remove this port again.
-    auto error  =Java_jackAudio4Java_Jack_portUnregisterN(&jniEnvMock,nullptr,clientHandle,portHandle);
+    auto error = Java_jackAudio4Java_Jack_portUnregisterN(&jniEnvMock, nullptr, clientHandle, portHandle);
+    EXPECT_EQ(error, 0);
+}
+
+/**
+ * A client can register a ProcessListener.
+ */
+TEST_F(JackTestClient, registerProcessListener) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jobject newListener;
+    _jmethodID processListener_onProcess;
+
+    // make the jniEnvMock return a non null value for GetMethodID
+    ON_CALL(jniEnvMock, GetMethodID(_,_,_))
+            .WillByDefault(Return(&processListener_onProcess));
+
+    jint error = Java_jackAudio4Java_Jack_registerProcessListenerN(&jniEnvMock, nullptr, clientHandle, &newListener);
+    EXPECT_EQ(error, 0);
+}
+
+/**
+ * A client can register a ProcessListener.
+ */
+TEST_F(JackTestClient, activateDeactivate){
+    jint error;
+    error = Java_jackAudio4Java_Jack_activateN(nullptr, nullptr, clientHandle);
+    EXPECT_EQ(error, 0);
+
+    error = Java_jackAudio4Java_Jack_deactivateN(nullptr, nullptr, clientHandle);
     EXPECT_EQ(error, 0);
 }

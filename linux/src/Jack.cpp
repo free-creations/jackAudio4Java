@@ -295,9 +295,9 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
     if (portType) portTypeN = env->GetStringUTFChars(portType, nullptr);
 
     // and here we go...
-    auto portHandle = jack_port_register ((jack_client_t *)client, portNameN, portTypeN, portFlags, bufferSize);
+    auto portHandle = jack_port_register(reinterpret_cast<jack_client_t *>(client), portNameN, portTypeN, portFlags, bufferSize);
 
-    return (jlong) portHandle;
+    return reinterpret_cast<jlong> (portHandle);
 }
 
 /**
@@ -315,5 +315,110 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portUnregisterN
         (JNIEnv *, jclass, jlong client, jlong port) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_portUnregisterN");
-    return jack_port_unregister((jack_client_t *) client, (jack_port_t *) port);
+    return jack_port_unregister(reinterpret_cast<jack_client_t *> (client), reinterpret_cast<jack_port_t *> (port));
+}
+
+
+static jmethodID  processListener_onProcess = nullptr;
+static jobject  processListener = nullptr;
+static JavaVM * jvm = nullptr;
+
+/**
+ * The process callback for this JACK application is called in a
+ * special realtime thread once for each audio cycle.
+ * The native callback delegates to the "onProcess" method
+ * defined in the java "ProcessListener" object.
+ */
+int processCallback(jack_nframes_t nframes, void *arg) {
+    if (processListener_onProcess == nullptr){
+        return -1;
+    }
+    if(jvm == nullptr){
+        SPDLOG_ERROR("jvm is NULL");
+        return -1;
+    }
+    JNIEnv * env;
+    jint success = jvm->AttachCurrentThread((void**) &env, NULL);
+    if(success != JNI_OK){
+        SPDLOG_ERROR("Could not attach to the current thread");
+        return -1;
+    }
+    jint error = env->CallIntMethod(processListener, processListener_onProcess,nframes);
+    jvm->DetachCurrentThread();
+    return error;
+}
+
+
+/**
+ * Tell the Jack server to call {@link ProcessListener#onProcess(int)}
+ * whenever there is work be done.
+ * <p>
+ * <p>
+ * NOTE: this function cannot be called while the client is active
+ * (after {@link #activate(ClientHandle)} has been called.)
+ *
+ * @param client          an opaque handle representing this client.
+ * @param processListener the listener that will be called for each process cycle.
+ * @return 0 on success, otherwise a non-zero error code.
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    registerProcessListenerN
+ * Signature: (JLjackAudio4Java/types/ProcessListener;)I
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
+        (JNIEnv * env, jclass, jlong client, jobject newListener){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_registerProcessListenerN");
+    if (newListener == nullptr) {
+        SPDLOG_WARN("process callbacks now switched off.");
+        processListener_onProcess = nullptr;
+        return -1;
+    }
+
+    // cache a pointer to the Java machine, for use in the "processCallback".
+    env->GetJavaVM(&jvm);
+
+    // pin the process Listener Object, so it will not be garbage collected.
+    processListener = env->NewGlobalRef(newListener);
+
+    // cache the method identifier, for use in the "processCallback".
+    jclass clazz = env->GetObjectClass(processListener);
+    processListener_onProcess = env->GetMethodID(clazz, "onProcess", "(I)I" );
+    if(processListener_onProcess == nullptr){
+        SPDLOG_ERROR("Could not register the Process Listener.");
+        return -1;
+    }
+    return jack_set_process_callback(reinterpret_cast<jack_client_t *>(client), processCallback, nullptr);
+
+}
+
+/**
+ * Tell the Jack server that the program is ready to start processing.
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    activateN
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_activateN
+        (JNIEnv *, jclass, jlong client){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_activateN");
+    return jack_activate(reinterpret_cast<jack_client_t *>(client));
+}
+
+/**
+ * Tell the Jack server to remove this client from the process
+ * graph.  Also, disconnect all ports belonging to it, since inactive
+ * clients have no port connections.
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    deactivateN
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_deactivateN
+        (JNIEnv *, jclass, jlong client){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_deactivateN");
+    return jack_deactivate(reinterpret_cast<jack_client_t *>(client));
 }

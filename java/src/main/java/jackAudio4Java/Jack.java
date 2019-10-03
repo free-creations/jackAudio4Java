@@ -251,8 +251,11 @@ public class Jack {
    * @return 0 on success, otherwise a non-zero error code
    */
   public int activate(ClientHandle client) {
-    throw new NotYetImplementedException();
+    if (client == null) return -1;
+    InternalClientHandle internalClientHandle = (InternalClientHandle) client;
+    return activateN(internalClientHandle.getReference());
   }
+  private native static int activateN(long clientHandle);
 
   // jack.h - line 212
 
@@ -264,8 +267,11 @@ public class Jack {
    * @return 0 on success, otherwise a non-zero error code
    */
   public int deactivate(ClientHandle client) {
-    throw new NotYetImplementedException();
+    if (client == null) return -1;
+    InternalClientHandle internalClientHandle = (InternalClientHandle) client;
+    return deactivateN(internalClientHandle.getReference());
   }
+  private native static int deactivateN(long clientHandle);
 
   // jack.h - line 316
 
@@ -304,8 +310,8 @@ public class Jack {
    * Tell the Jack server to call {@link ProcessListener#onProcess(int)}
    * whenever there is work be done.
    * <p>
-   * The parameter `arg` will be passed
-   * as second argument (mind the risk of race conditions and make `arg` immutable).
+   * (Note: The native function `jack_register_process_listener` has an additional parameter `arg`.
+   * This parameter is not represented in the java interface because of the risk of race conditions).
    * <p>
    * NOTE: this function cannot be called while the client is active
    * (after {@link #activate(ClientHandle)} has been called.)
