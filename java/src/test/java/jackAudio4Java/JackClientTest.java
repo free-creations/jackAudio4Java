@@ -83,15 +83,26 @@ public class JackClientTest {
    * A client shall be able to register a ProcessListener.
    */
   @Test
-  public void registerProcessListener() {
+  public void registerAndRunProcessListener() throws InterruptedException {
+    int error;
     TestProcessListener testProcessListener = new TestProcessListener();
+    assertThat(testProcessListener.count).isEqualTo(0);
+
     // when registering a valid ProcessListener, the error-code shall be zero
-    int error = Jack.server().registerProcessListener(client, testProcessListener);
+    error = Jack.server().registerProcessListener(client, testProcessListener);
     assertThat(error).isEqualTo(0);
 
-    // when registering Null as ProcessListener, the error-code shall be minus one.
-    error = Jack.server().registerProcessListener(client, null);
-    assertThat(error).isEqualTo(-1);
+    // activate and let it run for a second
+    error = Jack.server().activate(client);
+    assertThat(error).isEqualTo(0);
+
+    Thread.sleep(1000);
+
+    error = Jack.server().deactivate(client);
+    assertThat(error).isEqualTo(0);
+
+    assertThat(testProcessListener.count).isGreaterThan(10);
+
   }
 
 
