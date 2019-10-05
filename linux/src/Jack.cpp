@@ -22,6 +22,7 @@
  *
  */
 #include <jni.h>
+#include <thread>
 #include <jack/jack.h>
 #include "Jack.h"
 
@@ -319,33 +320,92 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portUnregisterN
 }
 
 
+/**
+ * Pointer to the java `onProcess` callback.
+ * It is allocated in procedure
+ * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ */
 static jmethodID  processListener_onProcess = nullptr;
+/**
+ * Pointer to the java process listener object.
+ * It is allocated in procedure
+ * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ */
 static jobject  processListener = nullptr;
+/**
+ * Pointer to the java virtual machine. It is allocated in procedure
+ * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ */
 static JavaVM * jvm = nullptr;
+/**
+ * Pointer to the java-Environment belonging
+ * to the JACK callback thread.
+ * It is cached in the first call of procedure
+ * `getJNIEnvForThread`.
+ */
+static JNIEnv * jackCallbackJNIEnv = nullptr;
+/**
+ * Identity of the thread executing the JACK callbacks.
+ * It is determined in the first call of procedure
+ * `getJNIEnvForThread`.
+ */
+static thread::id jackCallbackThreadId;
 
 /**
- * The process callback for this JACK application is called in a
- * special realtime thread once for each audio cycle.
- * The native callback delegates to the "onProcess" method
- * defined in the java "ProcessListener" object.
+ * Attaching a thread to the Java virtual machine is very costly.
+ *
+ * Doing this in each audio cycle would cause XRuns even with 256 Frames/Period.
+ * Therefore we cache the JNIEnv on the first invocation of processCallback.
+ *
+ * @return the JNI-Environment pointer for the current thread.
  */
-int processCallback(jack_nframes_t nframes, void *arg) {
-    if (processListener_onProcess == nullptr){
-        return -1;
+JNIEnv * getJNIEnvForCallbackThread(){
+
+    if (this_thread::get_id() == jackCallbackThreadId){
+        return jackCallbackJNIEnv;
     }
+    SPDLOG_TRACE("getJNIEnvForCallbackThread: new thread.");
     if(jvm == nullptr){
         SPDLOG_ERROR("jvm is NULL");
-        return -1;
+        return nullptr;
     }
     JNIEnv * env;
     jint success = jvm->AttachCurrentThread((void**) &env, NULL);
     if(success != JNI_OK){
         SPDLOG_ERROR("Could not attach to the current thread");
+        return nullptr;
+    }
+    jackCallbackJNIEnv = env;
+    jackCallbackThreadId = this_thread::get_id();
+    return jackCallbackJNIEnv;
+}
+
+/**
+  * The process callback for this JACK application is called in a
+  * special realtime thread once for each audio cycle.
+  * The native callback delegates to the "onProcess" method
+  * defined in the java "ProcessListener" object.
+  * @param nframes number of frames to process
+  * @return zero on success, non-zero on error
+  */
+int processCallback(jack_nframes_t nframes, void *) {
+
+    if (processListener_onProcess == nullptr){
+        // java callback routine not set...
         return -1;
     }
-    jint error = env->CallIntMethod(processListener, processListener_onProcess,nframes);
-    jvm->DetachCurrentThread();
-    return error;
+
+    JNIEnv * env = getJNIEnvForCallbackThread();
+    jint result;
+    if(env) {
+        // here we go... now we call the Java implementation of the processCallback.
+        result = env->CallIntMethod(processListener, processListener_onProcess, nframes);
+    }else{
+        result = -1;
+        SPDLOG_ERROR("Could not attach to the current thread");
+    }
+
+    return result;
 }
 
 
@@ -374,13 +434,13 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
         return -1;
     }
 
-    // cache a pointer to the Java machine, for use in the "processCallback".
+    // cache a pointer to the Java machine, for use in the "getJNIEnvForCallbackThread" routine.
     env->GetJavaVM(&jvm);
 
     // pin the process Listener Object, so it will not be garbage collected.
     processListener = env->NewGlobalRef(newListener);
 
-    // cache the method identifier, for use in the "processCallback".
+    // cache the method identifier, for use in the "getJNIEnvForCallbackThread" routine.
     jclass clazz = env->GetObjectClass(processListener);
     processListener_onProcess = env->GetMethodID(clazz, "onProcess", "(I)I" );
     if(processListener_onProcess == nullptr){

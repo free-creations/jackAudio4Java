@@ -96,10 +96,12 @@ public class JackClientTest {
     error = Jack.server().activate(client);
     assertThat(error).isEqualTo(0);
 
-    Thread.sleep(1000);
+    Thread.sleep(2000); // now run for two seconds
 
     error = Jack.server().deactivate(client);
     assertThat(error).isEqualTo(0);
+
+    Thread.sleep(50); // let it cool down...
 
     assertThat(testProcessListener.count).isGreaterThan(10);
 
