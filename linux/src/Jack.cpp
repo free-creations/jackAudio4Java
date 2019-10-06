@@ -451,6 +451,24 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
 
 }
 
+// jack.h - line 668
+
+/**
+ * Get the sample rate of the jack system, as set by the user when
+ * jackd was started.
+ *
+ * @return the sample rate of the jack system in samples per second.
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    getSampleRateN
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_getSampleRateN
+        (JNIEnv *, jclass, jlong client){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_getSampleRateN");
+    return jack_get_sample_rate(reinterpret_cast<jack_client_t *>(client));
+}
+
 /**
  * Tell the Jack server that the program is ready to start processing.
  *

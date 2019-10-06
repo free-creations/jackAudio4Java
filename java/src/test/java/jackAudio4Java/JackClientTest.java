@@ -8,6 +8,8 @@ import org.junit.Test;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
+import static jackAudio4Java.types.PortFlag.isOutput;
+import static jackAudio4Java.types.PortFlag.isPhysical;
 
 /**
  * These unit-tests check the functions that need an open connection to the
@@ -105,6 +107,27 @@ public class JackClientTest {
 
     assertThat(testProcessListener.count).isGreaterThan(10);
 
+  }
+
+  /**
+   * The sample rate for a client should be within a plausible range of
+   * 4 to 96 thousand samples per second.
+   */
+  @Test
+  public void getSampleRate() {
+    int sampleRate = Jack.server().getSampleRate(client);
+    assertThat(sampleRate).isAtLeast(4000);
+    assertThat(sampleRate).isAtMost(96000);
+  }
+
+  /**
+   * There should be at least one physical output port in the driver backend.
+   */
+  @Test
+  public void getPorts() {
+    String[] portNames = Jack.server().getPorts(client, null,null, new PortFlag[]{isPhysical, isOutput} );
+    assertThat(portNames).isNotNull();
+    assertThat(portNames.length).isAtLeast(1);
   }
 
 

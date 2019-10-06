@@ -17,7 +17,6 @@ package jackAudio4Java;
 
 import jackAudio4Java.types.*;
 
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -255,6 +254,7 @@ public class Jack {
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return activateN(internalClientHandle.getReference());
   }
+
   private native static int activateN(long clientHandle);
 
   // jack.h - line 212
@@ -271,6 +271,7 @@ public class Jack {
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return deactivateN(internalClientHandle.getReference());
   }
+
   private native static int deactivateN(long clientHandle);
 
   // jack.h - line 316
@@ -329,6 +330,23 @@ public class Jack {
   }
 
   private native static int registerProcessListenerN(long client, ProcessListener processListener);
+
+  // jack.h - line 668
+
+  /**
+   * Get the sample rate of the jack system, as set by the user when
+   * jackd was started.
+   *
+   * @return the sample rate of the jack system in samples per second.
+   */
+  public int getSampleRate(ClientHandle client) {
+    if (client == null) return 0;
+    if (!client.isValid()) return 0;
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+    return getSampleRateN(clientHandleN);
+  }
+
+  private native static int getSampleRateN(long client);
 
   // jack.h - line 711
 
@@ -543,24 +561,37 @@ public class Jack {
   /**
    * Look up ports - search ports.
    *
-   * @param port_name_pattern A regular expression used to select
-   *                          ports by name.  If NULL or of zero length, no selection based
-   *                          on name will be carried out.
-   * @param type_name_pattern A regular expression used to select
-   *                          ports by type.  If NULL or of zero length, no selection based
-   *                          on type will be carried out.
-   * @param flags             A value used to select ports by their flags.
-   *                          If zero, no selection based on flags will be carried out.
-   * @return an array of ports that match the specified
-   * arguments.  (The JNI lib is responsible for calling jack_free() any
-   * non-NULL returned value.)
-   * @see #portNameSize ,
-   * @see #portTypeSize
+   * @param portNamePattern A regular expression used to select ports by name.
+   *                        If `null` or of zero length, no selection based
+   *                        on name will be carried out.
+   * @param typeNamePattern A regular expression used to select ports by type.
+   *                        If `null` or of zero length, no selection based
+   *                        on type will be carried out.
+   * @param portFlags       An array of  {@link PortFlag}
+   *                        used to select ports by their flags (only ports that fulfill
+   *                        all given flags are selected).
+   *                        If `null`, no selection based on flags will be carried out.
+   * @return an array of port-names that match the specified
+   * arguments. If no match is found, an empty array will be returned.
    */
-  public String[] get_ports(ClientHandle client,
-                            String port_name_pattern,
-                            String type_name_pattern,
-                            long flags) {
-    throw new NotYetImplementedException();
+  public String[] getPorts(ClientHandle client,
+                           String portNamePattern,
+                           String typeNamePattern,
+                           PortFlag[] portFlags) {
+    String[] empty = new String[]{};
+
+    long clientHandleN = InternalClientHandle.getReferenceFrom(client);
+    if (clientHandleN == 0) return empty;
+
+    long portFlagsN = PortFlag.arrayToLong(portFlags);
+    String[] result = getPortsN(clientHandleN, portNamePattern, typeNamePattern, portFlagsN);
+    if (result == null) return empty;
+
+    return result;
   }
+
+  private static native String[] getPortsN(long client,
+                                           String portNamePattern,
+                                           String typeNamePattern,
+                                           long flags);
 }

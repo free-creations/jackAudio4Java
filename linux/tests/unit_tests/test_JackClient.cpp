@@ -158,3 +158,12 @@ TEST_F(JackTestClient, activateDeactivate){
     error = Java_jackAudio4Java_Jack_deactivateN(nullptr, nullptr, clientHandle);
     EXPECT_EQ(error, 0);
 }
+/**
+ * The sample rate for a client should be within a plausible range of
+ * 4 to 96 thousand samples per second.
+ */
+TEST_F(JackTestClient, getSampleRate){
+    jint sampleRate = Java_jackAudio4Java_Jack_getSampleRateN(nullptr, nullptr, clientHandle);
+    EXPECT_GE(sampleRate,4000);
+    EXPECT_LE(sampleRate,96000);
+}

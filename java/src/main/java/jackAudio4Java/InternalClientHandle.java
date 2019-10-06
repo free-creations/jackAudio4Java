@@ -36,5 +36,22 @@ class InternalClientHandle extends ClientHandle {
   void invalidate() {
     reference = 0;
   }
+
+  /**
+   * Attempt to cast the given handle into {@link InternalClientHandle) and
+   * extract its refeference.
+   * @param handle
+   * @return the internal reference or zero if the given object is not a valid
+   * InternalClientHandle.
+   */
+  static long getReferenceFrom(ClientHandle handle){
+    if(!handle.isValid()){
+      return 0;
+    }
+    if (!(handle instanceof InternalClientHandle)){
+      return 0;
+    }
+    return ((InternalClientHandle) handle).getReference();
+  }
 }
 
