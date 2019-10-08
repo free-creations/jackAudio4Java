@@ -286,7 +286,7 @@ JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_getClientNameN
  * @return a port handle on success, otherwise `null`.
  */
 JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
-        (JNIEnv * env, jclass, jlong client, jstring portName, jstring portType, jlong portFlags, jlong bufferSize) {
+        (JNIEnv *env, jclass, jlong client, jstring portName, jstring portType, jlong portFlags, jlong bufferSize) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_portRegisterN");
 
     // transform portName and portType from Java-string to UTF-8 Native string.
@@ -296,7 +296,8 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
     if (portType) portTypeN = env->GetStringUTFChars(portType, nullptr);
 
     // and here we go...
-    auto portHandle = jack_port_register(reinterpret_cast<jack_client_t *>(client), portNameN, portTypeN, portFlags, bufferSize);
+    auto portHandle = jack_port_register(reinterpret_cast<jack_client_t *>(client), portNameN, portTypeN, portFlags,
+                                         bufferSize);
 
     return reinterpret_cast<jlong> (portHandle);
 }
@@ -325,25 +326,25 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portUnregisterN
  * It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
  */
-static jmethodID  processListener_onProcess = nullptr;
+static jmethodID processListener_onProcess = nullptr;
 /**
  * Pointer to the java process listener object.
  * It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
  */
-static jobject  processListener = nullptr;
+static jobject processListener = nullptr;
 /**
  * Pointer to the java virtual machine. It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
  */
-static JavaVM * jvm = nullptr;
+static JavaVM *jvm = nullptr;
 /**
  * Pointer to the java-Environment belonging
  * to the JACK callback thread.
  * It is cached in the first call of procedure
  * `getJNIEnvForThread`.
  */
-static JNIEnv * jackCallbackJNIEnv = nullptr;
+static JNIEnv *jackCallbackJNIEnv = nullptr;
 /**
  * Identity of the thread executing the JACK callbacks.
  * It is determined in the first call of procedure
@@ -359,19 +360,19 @@ static thread::id jackCallbackThreadId;
  *
  * @return the JNI-Environment pointer for the current thread.
  */
-JNIEnv * getJNIEnvForCallbackThread(){
+JNIEnv *getJNIEnvForCallbackThread() {
 
-    if (this_thread::get_id() == jackCallbackThreadId){
+    if (this_thread::get_id() == jackCallbackThreadId) {
         return jackCallbackJNIEnv;
     }
     SPDLOG_TRACE("getJNIEnvForCallbackThread: new thread.");
-    if(jvm == nullptr){
+    if (jvm == nullptr) {
         SPDLOG_ERROR("jvm is NULL");
         return nullptr;
     }
-    JNIEnv * env;
-    jint success = jvm->AttachCurrentThread((void**) &env, NULL);
-    if(success != JNI_OK){
+    JNIEnv *env;
+    jint success = jvm->AttachCurrentThread((void **) &env, NULL);
+    if (success != JNI_OK) {
         SPDLOG_ERROR("Could not attach to the current thread");
         return nullptr;
     }
@@ -390,17 +391,17 @@ JNIEnv * getJNIEnvForCallbackThread(){
   */
 int processCallback(jack_nframes_t nframes, void *) {
 
-    if (processListener_onProcess == nullptr){
+    if (processListener_onProcess == nullptr) {
         // java callback routine not set...
         return -1;
     }
 
-    JNIEnv * env = getJNIEnvForCallbackThread();
+    JNIEnv *env = getJNIEnvForCallbackThread();
     jint result;
-    if(env) {
+    if (env) {
         // here we go... now we call the Java implementation of the processCallback.
         result = env->CallIntMethod(processListener, processListener_onProcess, nframes);
-    }else{
+    } else {
         result = -1;
         SPDLOG_ERROR("Could not attach to the current thread");
     }
@@ -426,7 +427,7 @@ int processCallback(jack_nframes_t nframes, void *) {
  * Signature: (JLjackAudio4Java/types/ProcessListener;)I
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
-        (JNIEnv * env, jclass, jlong client, jobject newListener){
+        (JNIEnv *env, jclass, jlong client, jobject newListener) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_registerProcessListenerN");
     if (newListener == nullptr) {
         SPDLOG_WARN("process callbacks now switched off.");
@@ -442,8 +443,8 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
 
     // cache the method identifier, for use in the "getJNIEnvForCallbackThread" routine.
     jclass clazz = env->GetObjectClass(processListener);
-    processListener_onProcess = env->GetMethodID(clazz, "onProcess", "(I)I" );
-    if(processListener_onProcess == nullptr){
+    processListener_onProcess = env->GetMethodID(clazz, "onProcess", "(I)I");
+    if (processListener_onProcess == nullptr) {
         SPDLOG_ERROR("Could not register the Process Listener.");
         return -1;
     }
@@ -464,7 +465,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_getSampleRateN
-        (JNIEnv *, jclass, jlong client){
+        (JNIEnv *, jclass, jlong client) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_getSampleRateN");
     return jack_get_sample_rate(reinterpret_cast<jack_client_t *>(client));
 }
@@ -479,7 +480,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_getSampleRateN
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_activateN
-        (JNIEnv *, jclass, jlong client){
+        (JNIEnv *, jclass, jlong client) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_activateN");
     return jack_activate(reinterpret_cast<jack_client_t *>(client));
 }
@@ -496,7 +497,74 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_activateN
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_deactivateN
-        (JNIEnv *, jclass, jlong client){
+        (JNIEnv *, jclass, jlong client) {
     SPDLOG_TRACE("Java_jackAudio4Java_Jack_deactivateN");
     return jack_deactivate(reinterpret_cast<jack_client_t *>(client));
+}
+
+/**
+ * Count the number of ports in the given array.
+ * @param ports a NULL-terminated array of port names.
+ * @return the number of port names found in the given array.
+ */
+int portCount(const char **ports) {
+    if (!ports) return 0;
+    int i = 0;
+    while (ports[i] != nullptr) {
+        i++;
+    }
+    return i;
+}
+
+/**
+ * Look up ports - search ports.
+ *
+ * @param client          A valid client handle.
+ * @param portNamePatternJ A regular expression used to select ports by name.
+ *                        If `null` or of zero length, no selection based
+ *                        on name will be carried out.
+ * @param typeNamePatternJ A regular expression used to select ports by type.
+ *                        If `null` or of zero length, no selection based
+ *                        on type will be carried out.
+ * @param portFlags       An array of  {@link PortFlag}
+ *                        used to select ports by their flags (only ports that fulfill
+ *                        all given flags are selected).
+ *                        If `null`, no selection based on flags will be carried out.
+ * @return an array of port-names that match the specified
+ * arguments. If no match is found, an empty array will be returned.
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    getPortsN
+ * Signature: (JLjava/lang/String;Ljava/lang/String;J)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
+        (JNIEnv *env, jclass, jlong client, jstring portNamePatternJ, jstring typeNamePatternJ, jlong portFlags) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_getPortsN");
+
+    const char *portNamePatternN = nullptr;
+    if (portNamePatternJ) portNamePatternN = env->GetStringUTFChars(portNamePatternJ, nullptr);
+
+    const char *typeNamePatternN = nullptr;
+    if (typeNamePatternJ) typeNamePatternN = env->GetStringUTFChars(typeNamePatternJ, nullptr);
+
+    auto ports = jack_get_ports(reinterpret_cast<jack_client_t *>(client),
+                                portNamePatternN,
+                                typeNamePatternN,
+                                portFlags);
+
+    if (typeNamePatternN) env->ReleaseStringUTFChars(typeNamePatternJ, typeNamePatternN);
+    if (portNamePatternN) env->ReleaseStringUTFChars(portNamePatternJ, portNamePatternN);
+
+    int count = portCount(ports);
+    if (count == 0) {
+        return nullptr;
+    }
+    auto stringClazz = env->FindClass("java/lang/String");
+    auto result = env->NewObjectArray(count, stringClazz, nullptr);
+    for (int i = 0; i < count; i++) {
+        auto portNameI = env->NewStringUTF(ports[i]);
+        env->SetObjectArrayElement(result, i, portNameI);
+        env->DeleteLocalRef(portNameI);
+    }
+    return result;
 }

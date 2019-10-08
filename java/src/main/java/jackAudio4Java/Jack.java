@@ -18,6 +18,7 @@ package jackAudio4Java;
 import jackAudio4Java.types.*;
 
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 /**
  * use it like this:
@@ -560,7 +561,7 @@ public class Jack {
 
   /**
    * Look up ports - search ports.
-   *
+   * @param client          A valid client handle.
    * @param portNamePattern A regular expression used to select ports by name.
    *                        If `null` or of zero length, no selection based
    *                        on name will be carried out.
@@ -583,11 +584,26 @@ public class Jack {
     long clientHandleN = InternalClientHandle.getReferenceFrom(client);
     if (clientHandleN == 0) return empty;
 
+
+    verifyPattern(portNamePattern);
+    verifyPattern(typeNamePattern);
     long portFlagsN = PortFlag.arrayToLong(portFlags);
     String[] result = getPortsN(clientHandleN, portNamePattern, typeNamePattern, portFlagsN);
     if (result == null) return empty;
 
     return result;
+  }
+
+  /**
+   * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with a invalid regex pattern
+   * like "*1".
+   * This function throws java.util.regex.PatternSyntaxException when the pattern is invalid...
+   * @param regex
+   */
+  static void verifyPattern(String regex){
+    if(regex != null) {
+      Pattern.compile(regex);
+    }
   }
 
   private static native String[] getPortsN(long client,

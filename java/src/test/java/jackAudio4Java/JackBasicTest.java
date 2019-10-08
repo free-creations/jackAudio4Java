@@ -137,4 +137,16 @@ public class JackBasicTest {
     assertThat(client.isValid()).isFalse();
   }
 
+  @Test(expected = java.util.regex.PatternSyntaxException.class)
+  public void throwWrongPattern() {
+     Jack.verifyPattern("*1");
+  }
+
+  @Test
+  public void passGoodPattern() {
+    Jack.verifyPattern("1*");
+    Jack.verifyPattern(null);
+
+  }
+
 }

@@ -32,6 +32,7 @@ using testing::NiceMock; // Note: "NiceMock" does not nag with useless warnings.
 using testing::_;
 using testing::Ge;
 using testing::StrEq;
+using testing::AtLeast;
 
 
 using namespace jnimock;
@@ -69,7 +70,7 @@ protected:
         if (failure) {
             throw std::runtime_error("Failed to close Jack Client.");
         } else {
-            SPDLOG_TRACE("Jack client closed.");
+            spdlog::info("Jack client closed.");
         }
     }
 };
@@ -140,7 +141,7 @@ TEST_F(JackTestClient, registerProcessListener) {
     _jmethodID processListener_onProcess;
 
     // make the jniEnvMock return a non null value for GetMethodID
-    ON_CALL(jniEnvMock, GetMethodID(_,_,_))
+    ON_CALL(jniEnvMock, GetMethodID(_, _, _))
             .WillByDefault(Return(&processListener_onProcess));
 
     jint error = Java_jackAudio4Java_Jack_registerProcessListenerN(&jniEnvMock, nullptr, clientHandle, &newListener);
@@ -150,7 +151,7 @@ TEST_F(JackTestClient, registerProcessListener) {
 /**
  * A client can register a ProcessListener.
  */
-TEST_F(JackTestClient, activateDeactivate){
+TEST_F(JackTestClient, activateDeactivate) {
     jint error;
     error = Java_jackAudio4Java_Jack_activateN(nullptr, nullptr, clientHandle);
     EXPECT_EQ(error, 0);
@@ -162,8 +163,37 @@ TEST_F(JackTestClient, activateDeactivate){
  * The sample rate for a client should be within a plausible range of
  * 4 to 96 thousand samples per second.
  */
-TEST_F(JackTestClient, getSampleRate){
+TEST_F(JackTestClient, getSampleRate) {
     jint sampleRate = Java_jackAudio4Java_Jack_getSampleRateN(nullptr, nullptr, clientHandle);
-    EXPECT_GE(sampleRate,4000);
-    EXPECT_LE(sampleRate,96000);
+    EXPECT_GE(sampleRate, 4000);
+    EXPECT_LE(sampleRate, 96000);
+}
+
+/**
+  * There should be at least one physical output port in the driver backend.
+  */
+TEST_F(JackTestClient, getPorts) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+
+    EXPECT_CALL(jniEnvMock, SetObjectArrayElement(_, _, _))
+            .Times(AtLeast(1));
+
+    Java_jackAudio4Java_Jack_getPortsN(&jniEnvMock, nullptr, clientHandle, nullptr, nullptr, 0);
+}
+
+/**
+  * If searching for a port whose name match "impossible", no port should be found.
+  */
+TEST_F(JackTestClient, getPortsImpossible) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jstring portNamePatternJ; // the "java version" of the port name pattern.
+    const char *portNamePatternN = "impossibleRubbish"; // the "native version" of the port name pattern.
+
+
+    // make the jniEnvMock return portNameN for portNameJ
+    ON_CALL(jniEnvMock, GetStringUTFChars(&portNamePatternJ, nullptr))
+            .WillByDefault(Return(portNamePatternN));
+
+    auto result = Java_jackAudio4Java_Jack_getPortsN(&jniEnvMock, nullptr, clientHandle, &portNamePatternJ, nullptr, 0);
+    EXPECT_EQ(result, nullptr);
 }

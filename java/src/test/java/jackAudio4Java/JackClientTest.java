@@ -125,11 +125,23 @@ public class JackClientTest {
    */
   @Test
   public void getPorts() {
-    String[] portNames = Jack.server().getPorts(client, null,null, new PortFlag[]{isPhysical, isOutput} );
+    String[] portNames = Jack.server().getPorts(client, null,PortType.defaultAudio().toString(), new PortFlag[]{isPhysical, isOutput} );
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isAtLeast(1);
+    for(String name: portNames){
+      System.out.println("--- port-name "+name);
+    }
   }
 
+  /**
+   * If searching for a port whose name match "impossible", no port should be found.
+   */
+  @Test
+  public void getPortsImpossible() {
+    String[] portNames = Jack.server().getPorts(client, "impossible",null, null );
+    assertThat(portNames).isNotNull();
+    assertThat(portNames.length).isEqualTo(0);
+  }
 
   private static class TestProcessListener implements ProcessListener {
     long count = 0;
@@ -140,4 +152,7 @@ public class JackClientTest {
       return 0;
     }
   }
-}
+
+
+
+  }
