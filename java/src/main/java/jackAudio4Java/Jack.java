@@ -341,9 +341,9 @@ public class Jack {
    * @return the sample rate of the jack system in samples per second.
    */
   public int getSampleRate(ClientHandle client) {
-    if (client == null) return 0;
-    if (!client.isValid()) return 0;
-    long clientHandleN = ((InternalClientHandle) client).getReference();
+
+    long clientHandleN = InternalClientHandle.getReferenceFrom(client);
+    if (clientHandleN == 0) return 0;
     return getSampleRateN(clientHandleN);
   }
 

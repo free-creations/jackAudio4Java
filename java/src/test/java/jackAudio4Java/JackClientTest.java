@@ -118,6 +118,7 @@ public class JackClientTest {
     int sampleRate = Jack.server().getSampleRate(client);
     assertThat(sampleRate).isAtLeast(4000);
     assertThat(sampleRate).isAtMost(96000);
+    System.out.println("--- sample rate "+sampleRate);
   }
 
   /**

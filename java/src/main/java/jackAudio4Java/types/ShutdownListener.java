@@ -31,18 +31,6 @@ public interface ShutdownListener {
    * safely used inside the shutdown callback and has to be called outside of
    * the callback context.
    * <p>
-   * Further, the native documentation says:
-   * <p>
-   * > Note that after server shutdown,
-   * > the client pointer is __not__ deallocated by libjack,
-   * > the application is responsible to properly use jack_client_close()
-   * > to release client ressources.
-   * <p>
-   * The above note is (probably) irrelevant for _jackAudio4Java_, because
-   * in Java, the arg-Object is not passed to the server, but is managed
-   * by the Java engine. But nevertheless, be aware of race conditions.
-   *
-   * @param arg pointer to a client supplied structure
    */
-  public void onShutdown(Object arg);
+  public void onShutdown();
 }

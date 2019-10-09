@@ -555,6 +555,8 @@ JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
     if (typeNamePatternN) env->ReleaseStringUTFChars(typeNamePatternJ, typeNamePatternN);
     if (portNamePatternN) env->ReleaseStringUTFChars(portNamePatternJ, portNamePatternN);
 
+    if(ports == nullptr) return nullptr;
+
     int count = portCount(ports);
     if (count == 0) {
         return nullptr;
@@ -566,5 +568,7 @@ JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
         env->SetObjectArrayElement(result, i, portNameI);
         env->DeleteLocalRef(portNameI);
     }
+    free(ports);
+
     return result;
 }
