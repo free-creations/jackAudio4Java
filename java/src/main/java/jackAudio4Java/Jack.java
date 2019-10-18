@@ -15,8 +15,10 @@
  */
 package jackAudio4Java;
 
+import jackAudio4Java.buffers.MutableAudioSlice;
 import jackAudio4Java.types.*;
 
+import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -389,7 +391,7 @@ public class Jack {
     if (portHandleN == 0) {
       return null;
     }
-    return new InternalPortHandle(portHandleN);
+    return new InternalPortHandle(portHandleN, portName, portType, portFlags);
   }
 
   private native static long portRegisterN(long client,
@@ -470,15 +472,31 @@ public class Jack {
   /**
    * Receive audio data from an input port.
    * <p>
-   * The port must have been created with the flag {@link PortFlag#isInput}.
+   * The port must have been created as a defaultAudio port with the flag {@link PortFlag#isInput}.
    *
-   * @param inputPort      an opaque handle representing a inputPort.
+   * @param port      an opaque handle representing a inputPort.
    * @param inputContainer a client supplied container that will be filled with the received data.
    * @return 0 on success, otherwise a non-zero error code.
    */
-  public int portGetAudioData(PortHandle inputPort, float[] inputContainer) {
-    throw new NotYetImplementedException();
+  public int portGetAudioData(PortHandle port, MutableAudioSlice inputContainer) {
+    if (port == null) return -1;
+    if (!port.isValid()) return -1;
+    if(!port.getType().equals(PortType.defaultAudio()))
+      throw new RuntimeException("Cannot get audio from "+port.getType());
+    if (!PortFlag.arrayContains(port.getFlags(),PortFlag.isInput))
+      throw new RuntimeException(port.getName()+" is not an input port");
+    InternalPortHandle internalPortHandle = (InternalPortHandle) port;
+    long portHandleN = internalPortHandle.getReference();
+
+    if (inputContainer == null) return -1;
+    InternalAudioSlice slice = (InternalAudioSlice) inputContainer;
+    final FloatBuffer internalBuffer = slice.getInternalBuffer();
+    if(!internalBuffer.isDirect()) return -1;
+
+    return portGetAudioDataN(portHandleN, internalBuffer);
   }
+
+  private native static int portGetAudioDataN(long portHandleN, FloatBuffer internalBuffer);
 
   /**
    * Send data over an output port.

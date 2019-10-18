@@ -13,33 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jackAudio4Java;
+package jackAudio4Java.buffers;
 
+public class Manager {
 
-import jackAudio4Java.types.PortFlag;
-import jackAudio4Java.types.PortHandle;
-import jackAudio4Java.types.PortType;
+  protected Manager(int cycleLength){
 
-/**
- * Instances of this class shall not be created by any object other than {@link Jack}.
- */
-class InternalPortHandle extends PortHandle {
-
-  InternalPortHandle(long reference, String portName, PortType portType, PortFlag[] portFlags) {
-    super ( reference,  portName,  portType,  portFlags);
-  }
-
-
-
-  long getReference() {
-    return reference;
-  }
-
-  /**
-   * Call this function when closing the port.
-   */
-  void invalidate() {
-    reference = 0;
   }
 }
-

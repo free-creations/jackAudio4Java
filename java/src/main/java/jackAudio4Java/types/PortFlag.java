@@ -15,8 +15,6 @@
  */
 package jackAudio4Java.types;
 
-import java.util.Set;
-
 public enum PortFlag {
 
   /**
@@ -77,18 +75,19 @@ public enum PortFlag {
     return bits;
   }
 
+
   /**
-   * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
-   *
-   * @param flags a set of port flags
-   * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   * Check if the given array of flags contains the item.
+   * @param flags an array of {@link PortFlag}s.
+   * @param item an item to search for.
+   * @return true if the item is a member of the array.
    */
-  public static long setToLong(Set<PortFlag> flags) {
-    long result = 0;
-    for (PortFlag flag : flags) {
-      result = result | flag.getBits();
+  public static boolean arrayContains(PortFlag[] flags, PortFlag item) {
+    if(flags == null) return false;
+    for (PortFlag f : flags) {
+      if (f == item) return true;
     }
-    return result;
+    return false;
   }
 
   /**

@@ -2,6 +2,8 @@ package jackAudio4Java.types;
 
 import jackAudio4Java.Jack;
 
+import java.util.Objects;
+
 /**
  * An Enum like data structure for describing _port types_.
  * <p>
@@ -13,6 +15,8 @@ import jackAudio4Java.Jack;
 public class PortType {
 
   private final String portTypeName;
+  static final String _32BitFloatMonoAudio = "32 bit float mono audio";
+  static final String _8BitRawMidi = "8 bit raw midi";
 
   private PortType(String portTypeName) {
     this.portTypeName = portTypeName;
@@ -24,7 +28,7 @@ public class PortType {
    * @return the built-in __Audio__ port-type.
    */
   public static PortType defaultAudio() {
-    return new PortType("32 bit float mono audio");
+    return new PortType(_32BitFloatMonoAudio);
   }
 
   /**
@@ -33,7 +37,7 @@ public class PortType {
    * @return the built-in __Midi__ port-type.
    */
   public static PortType defaultMidi() {
-    return new PortType("8 bit raw midi");
+    return new PortType(_8BitRawMidi);
   }
 
   /**
@@ -53,5 +57,18 @@ public class PortType {
   @Override
   public String toString() {
     return portTypeName;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    PortType portType = (PortType) o;
+    return portTypeName.equals(portType.portTypeName);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(portTypeName);
   }
 }

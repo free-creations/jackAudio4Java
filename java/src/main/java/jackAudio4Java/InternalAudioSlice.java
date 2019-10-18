@@ -15,31 +15,12 @@
  */
 package jackAudio4Java;
 
+import jackAudio4Java.buffers.AudioSlice;
 
-import jackAudio4Java.types.PortFlag;
-import jackAudio4Java.types.PortHandle;
-import jackAudio4Java.types.PortType;
+import java.nio.FloatBuffer;
 
-/**
- * Instances of this class shall not be created by any object other than {@link Jack}.
- */
-class InternalPortHandle extends PortHandle {
+interface InternalAudioSlice extends AudioSlice {
 
-  InternalPortHandle(long reference, String portName, PortType portType, PortFlag[] portFlags) {
-    super ( reference,  portName,  portType,  portFlags);
-  }
+  FloatBuffer getInternalBuffer();
 
-
-
-  long getReference() {
-    return reference;
-  }
-
-  /**
-   * Call this function when closing the port.
-   */
-  void invalidate() {
-    reference = 0;
-  }
 }
-
