@@ -32,16 +32,7 @@ public interface MutableAudioSlice extends ImmutableAudioSlice, AudioSlice {
 
 
   /**
-   * Relative put method
-   *
-   * Writes the given float into this buffer at the current position, and then increments the position.
-   *
-   * @param value The value of the audio sample to be written
-   */
-  void put(float value);
-
-  /**
-   * Returns this slice as immutable data which can safely be exchanged among threads.
+   * Returns this slice as immutable data. An  ImmutableAudioSlice can safely be exchanged among threads.
    * @return an immutable version of this slice.
    */
   ImmutableAudioSlice asImmutable();

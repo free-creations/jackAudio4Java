@@ -15,6 +15,7 @@
  */
 package jackAudio4Java;
 
+import jackAudio4Java.buffers.InternalAudioSlice;
 import jackAudio4Java.buffers.MutableAudioSlice;
 import jackAudio4Java.types.*;
 
@@ -46,6 +47,8 @@ public class Jack {
     Jack result = instance;
     if (result == null) {
       synchronized (creationLock) {
+        if (!isAvailable())
+          throw new RuntimeException("Jack cannot be run on this installation.");
         result = instance;
         if (result == null)
           instance = result = new Jack();
@@ -77,6 +80,22 @@ public class Jack {
     if (javaLevel.intValue() <= Level.SEVERE.intValue()) return NATIVE_LEVEL_ERROR;
     return NATIVE_LEVEL_OFF;
 
+  }
+
+  /**
+   * Check whether Jack is installed and works on this machine.
+   * @return true if Jack probably works.
+   */
+  public static boolean isAvailable(){
+    return true;
+  }
+
+  /**
+   * Explain why Jack cannot be used with this box.
+   * @return a String that can be used in error messages etc.
+   */
+  public static String reasonForUnavailability(){
+    return "";
   }
 
   /**
@@ -474,24 +493,24 @@ public class Jack {
    * <p>
    * The port must have been created as a defaultAudio port with the flag {@link PortFlag#isInput}.
    *
-   * @param port      an opaque handle representing a inputPort.
+   * @param port           an opaque handle representing a inputPort.
    * @param inputContainer a client supplied container that will be filled with the received data.
    * @return 0 on success, otherwise a non-zero error code.
    */
   public int portGetAudioData(PortHandle port, MutableAudioSlice inputContainer) {
     if (port == null) return -1;
     if (!port.isValid()) return -1;
-    if(!port.getType().equals(PortType.defaultAudio()))
-      throw new RuntimeException("Cannot get audio from "+port.getType());
-    if (!PortFlag.arrayContains(port.getFlags(),PortFlag.isInput))
-      throw new RuntimeException(port.getName()+" is not an input port");
+    if (!port.getType().equals(PortType.defaultAudio()))
+      throw new RuntimeException(port.getName() + " is not an audio port");
+    if (!PortFlag.arrayContains(port.getFlags(), PortFlag.isInput))
+      throw new RuntimeException(port.getName() + " is not an input port");
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     long portHandleN = internalPortHandle.getReference();
 
     if (inputContainer == null) return -1;
     InternalAudioSlice slice = (InternalAudioSlice) inputContainer;
-    final FloatBuffer internalBuffer = slice.getInternalBuffer();
-    if(!internalBuffer.isDirect()) return -1;
+    final FloatBuffer internalBuffer = slice.accessInternalBuffer();
+    if (!internalBuffer.isDirect()) return -1;
 
     return portGetAudioDataN(portHandleN, internalBuffer);
   }
@@ -579,6 +598,7 @@ public class Jack {
 
   /**
    * Look up ports - search ports.
+   *
    * @param client          A valid client handle.
    * @param portNamePattern A regular expression used to select ports by name.
    *                        If `null` or of zero length, no selection based
@@ -602,9 +622,9 @@ public class Jack {
     long clientHandleN = InternalClientHandle.getReferenceFrom(client);
     if (clientHandleN == 0) return empty;
 
-
     verifyPattern(portNamePattern);
     verifyPattern(typeNamePattern);
+
     long portFlagsN = PortFlag.arrayToLong(portFlags);
     String[] result = getPortsN(clientHandleN, portNamePattern, typeNamePattern, portFlagsN);
     if (result == null) return empty;
@@ -615,12 +635,15 @@ public class Jack {
   /**
    * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with a invalid regex pattern
    * like "*1".
-   * This function throws java.util.regex.PatternSyntaxException when the pattern is invalid...
-   * @param regex
+   * This function verifies the given pattern and throws java.util.regex.PatternSyntaxException
+   * if the pattern is invalid.
+   *
+   * @param regex the regex pattern to be tested.
+   * @throws java.util.regex.PatternSyntaxException if the pattern is invalid.
    */
-  static void verifyPattern(String regex){
-    if(regex != null) {
-      Pattern.compile(regex);
+  static void verifyPattern(String regex) {
+    if (regex != null) {
+      final Pattern ignore = Pattern.compile(regex);
     }
   }
 

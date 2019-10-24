@@ -25,7 +25,7 @@ public class PortHandle {
    * Only the class InternalPortHandle
    * shall have access to this item.
    */
-  protected long reference;
+  protected volatile long reference;
 
   private final String name;
   private final PortType type;

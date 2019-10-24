@@ -15,9 +15,37 @@
  */
 package jackAudio4Java.buffers;
 
+import jackAudio4Java.NotYetImplementedException;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 public class Manager {
 
-  protected Manager(int cycleLength){
+  /**
+   * Create a direct float buffer of given length.
+   *
+   * @param length the number float elements provided by the buffer.
+   * @return a direct float buffer.
+   */
+  private static FloatBuffer makeDirectFloatBuffer(int length) {
+    ByteBuffer newByteBuffer = ByteBuffer.allocateDirect(length * Float.SIZE / Byte.SIZE);
+    newByteBuffer.order(ByteOrder.nativeOrder()); // see https://bugs.openjdk.java.net/browse/JDK-5043362
+    FloatBuffer newFloatBuffer = newByteBuffer.asFloatBuffer();
+    newFloatBuffer.clear();
+    return newFloatBuffer;
+  }
 
+  protected Manager(){
+
+  }
+
+  MutableAudioSlice makeMakeMutableAudioSlice(ImmutableAudioSliceImpl immutableAudioSlice) {
+    throw new NotYetImplementedException();
+  }
+
+  void recycle(FloatBuffer buffer) {
+    throw new NotYetImplementedException();
   }
 }

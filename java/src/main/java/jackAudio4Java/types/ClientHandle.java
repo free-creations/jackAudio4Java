@@ -30,7 +30,7 @@ public class ClientHandle {
    * The native address of this client. Only the class InternalClientHandle
    * shall have access to this item.
    */
-  protected long reference;
+  protected volatile long reference;
 
   /**
    * A client handle is considered valid, if it is not referencing a null pointer.

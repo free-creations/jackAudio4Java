@@ -29,36 +29,6 @@ public interface ImmutableAudioSlice extends AudioSlice{
    */
   int length();
 
-  /**
-   * Returns the position of the pointer in this slice.
-   *
-   * @return The position of the pointer in this slice.
-   */
-  int position();
-
-  /**
-   * Sets the position of the pointer to the first element in this slice.
-   */
-  void reset();
-
-  /**
-   * Returns true if the slice has more elements.
-   * (In other words, returns true if getNext() would return an element rather than throwing an exception.)
-   *
-   * @return true if the slice has more elements
-   */
-  boolean hasNext();
-
-  /**
-   * Relative get method.
-   * <p>
-   * Reads the audio sample at the current position, and then increments the position.
-   *
-   * @return The audio sample at the current position
-   * @throws java.nio.BufferUnderflowException If there are no more samples in this slice.
-   */
-  float getNext();
-
 
   /**
    * Absolute get method. Reads the float at the given index.

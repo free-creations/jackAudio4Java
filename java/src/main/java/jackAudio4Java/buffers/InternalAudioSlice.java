@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jackAudio4Java;
+package jackAudio4Java.buffers;
 
 import jackAudio4Java.buffers.AudioSlice;
 
 import java.nio.FloatBuffer;
 
-interface InternalAudioSlice extends AudioSlice {
+/**
+ * This is an internal interface that should not be used be clients.
+ * It gives access to the hidden internal resources of a slice.
+ */
+public interface InternalAudioSlice extends AudioSlice {
 
-  FloatBuffer getInternalBuffer();
+  FloatBuffer accessInternalBuffer();
 
 }
