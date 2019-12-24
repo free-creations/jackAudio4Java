@@ -16,9 +16,14 @@
 package jackAudio4Java.types;
 
 /**
- * The ProcessCallback interface should be implemented by any class
+ * The ProcessListener interface should be implemented by any class
  * whose instances are intended to be called by the Jack server
  * whenever there is work be done.
+ *
+ * On every cycle, the Jack server will call-back the function `onProcess`.
+ * The code supplied in this function shall perform the work the the client
+ * is meant to do.
+ *
  */
 public interface ProcessListener {
   /**
