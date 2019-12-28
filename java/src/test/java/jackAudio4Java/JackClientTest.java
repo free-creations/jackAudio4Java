@@ -13,12 +13,12 @@ import static jackAudio4Java.types.PortFlag.isPhysical;
 
 /**
  * These unit-tests check the functions that need an open connection to the
- * the Jack - audio - server. Or in other words, checks that need valid
- * client handle.
+ * the Jack - audio - server. Or, in other words, these are verifications that rely on the existence of a _valid
+ * client handle_.
  */
 public class JackClientTest {
   private static ClientHandle client;
-  private static final String clientName = "JackClientÜÄÖéè";
+  private static final String clientName = "JackClientÜÄÖéè"; // use a name with diacritics
 
   /**
    * Initialize the tests and register a new client with the jack server.
@@ -68,7 +68,7 @@ public class JackClientTest {
   }
 
   /**
-   * A client can be activated and can can be deactivated.
+   * A client can be activated and can be deactivated.
    */
   @Test
   public void activateDeactivate() {
@@ -119,7 +119,7 @@ public class JackClientTest {
     int sampleRate = Jack.server().getSampleRate(client);
     assertThat(sampleRate).isAtLeast(4000);
     assertThat(sampleRate).isAtMost(96000);
-    System.out.println("--- sample rate "+sampleRate);
+    System.out.println("--- sample rate " + sampleRate);
   }
 
   /**
@@ -127,11 +127,13 @@ public class JackClientTest {
    */
   @Test
   public void getPorts() {
-    String[] portNames = Jack.server().getPorts(client, null,PortType.defaultAudio().toString(), new PortFlag[]{isPhysical, isOutput} );
+    String[] portNames =
+            Jack.server().getPorts(client, null, PortType.defaultAudio().toString(),
+                    new PortFlag[]{isPhysical, isOutput});
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isAtLeast(1);
-    for(String name: portNames){
-      System.out.println("--- port-name "+name);
+    for (String name : portNames) {
+      System.out.println("--- port-name " + name);
     }
   }
 
@@ -140,19 +142,19 @@ public class JackClientTest {
    */
   @Test
   public void getPortsImpossible() {
-    String[] portNames = Jack.server().getPorts(client, "impossible",null, null );
+    String[] portNames = Jack.server().getPorts(client, "impossible", null, null);
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isEqualTo(0);
   }
 
   /**
-   * A ProcessListener that simply count the number of times,
-   * the onProcess function has been called.   *
+   * A ProcessListener that simply counts the number of times,
+   * the `onProcess` function has been called.
    */
   private static class TestProcessListener implements ProcessListener {
     /**
      * The counter.
-     *
+     * <p>
      * Please note, that for the sake of simplicity, no provision have been made to ensure
      * thread safety.
      */
@@ -166,5 +168,4 @@ public class JackClientTest {
   }
 
 
-
-  }
+}

@@ -16,7 +16,11 @@
 package jackAudio4Java.types;
 
 /**
- * PortHandle is an opaque type.  It stores a reference to a port.
+ * PortHandle stores a _native address_ to a port.
+ *
+ * A _native address_ points to a real physical memory location, such a piece of data should
+ * never be accessed outside this package. Therefore, this public-class hides the reference
+ * in a protected variable.
  */
 public class PortHandle {
   /**

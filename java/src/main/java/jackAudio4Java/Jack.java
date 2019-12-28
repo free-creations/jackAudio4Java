@@ -84,17 +84,19 @@ public class Jack {
 
   /**
    * Check whether Jack is installed and works on this machine.
+   *
    * @return true if Jack probably works.
    */
-  public static boolean isAvailable(){
+  public static boolean isAvailable() {
     return true;
   }
 
   /**
    * Explain why Jack cannot be used with this box.
+   *
    * @return a String that can be used in error messages etc.
    */
-  public static String reasonForUnavailability(){
+  public static String reasonForUnavailability() {
     return "";
   }
 
@@ -214,17 +216,23 @@ public class Jack {
   // jack.h - line 128
 
   /**
-   * Disconnects an external client from a JACK server.
    *
+   * @return
+   */
+  /**
+   * Disconnects an external client from a JACK server
+   * and invalidates the given client handle.
+   *
+   * @param client handle for an open client.
    * @return 0 on success, otherwise a non-zero error code
    */
   public int clientClose(ClientHandle client) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
-    int error = clientCloseN(internalClientHandle.getReference());
+    long reference = internalClientHandle.getReference();
     internalClientHandle.invalidate();
-    return error;
+    return clientCloseN(reference);
   }
 
   private native static int clientCloseN(long clientHandle);
@@ -253,12 +261,16 @@ public class Jack {
    * status was returned.  In that case, the actual
    * name will differ from the `clientName` requested.
    *
-   * @return the actual client name.
+   * @param client a valid client handle.
+   * @return the actual client name or the string "Invalid Client" if the given handle was not valid.
    */
   public String getClientName(ClientHandle client) {
-    if (client == null) return null;
+    final String invalidClient = "Invalid Client";
+    if (client == null) return invalidClient;
+    if (!client.isValid()) return invalidClient;
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return getClientNameN(internalClientHandle.getReference());
+
   }
 
   private native static String getClientNameN(long clientHandle);
@@ -269,10 +281,12 @@ public class Jack {
   /**
    * Tell the Jack server that the program is ready to start processing.
    *
+   * @param client a valid client handle.
    * @return 0 on success, otherwise a non-zero error code
    */
   public int activate(ClientHandle client) {
     if (client == null) return -1;
+    if (!client.isValid()) return -1;
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return activateN(internalClientHandle.getReference());
   }
@@ -286,10 +300,12 @@ public class Jack {
    * graph.  Also, disconnect all ports belonging to it, since inactive
    * clients have no port connections.
    *
+   * @param client a valid client handle.
    * @return 0 on success, otherwise a non-zero error code
    */
   public int deactivate(ClientHandle client) {
     if (client == null) return -1;
+    if (!client.isValid()) return -1;
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return deactivateN(internalClientHandle.getReference());
   }
@@ -299,7 +315,7 @@ public class Jack {
   // jack.h - line 316
 
   /**
-   * Register a function (and optionally an argument) to be called if and when the
+   * Register a function to be called if and when the
    * JACK server shuts down the client thread.
    * <p>
    * NOTE: clients do not need to call this.  It exists only
@@ -318,11 +334,13 @@ public class Jack {
    *
    * @param client           an opaque handle representing this client.
    * @param shutdownListener the listener that will be called on shutdown.
-   * @param arg              an arbitrary object that will handed to the shutdownListener on shutdown.
    */
   public void registerShutdownListener(ClientHandle client,
-                                       ShutdownListener shutdownListener, Object arg) {
+                                       ShutdownListener shutdownListener) {
     throw new NotYetImplementedException();
+    /***
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
 
   }
 
