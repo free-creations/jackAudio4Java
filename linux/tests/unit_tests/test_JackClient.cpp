@@ -161,8 +161,8 @@ TEST_F(JackTestClient, registerShutdownListener) {
             .WillByDefault(Return(&shutdownListener_onShutdown));
 
     jint error = Java_jackAudio4Java_Jack_registerShutdownListenerN(&jniEnvMock, nullptr, clientHandle, &newListener);
-    spdlog::info("You may stop Jack within the next 10 seconds to see the \"localShutdownCallback\" message.");
-    sleep(10);
+    //spdlog::info("You may stop Jack within the next 10 seconds to see the \"localShutdownCallback\" message.");
+    //sleep(10);
 
     EXPECT_EQ(error, 0);
 }

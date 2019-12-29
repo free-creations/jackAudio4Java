@@ -335,14 +335,16 @@ public class Jack {
    * @param client           an opaque handle representing this client.
    * @param shutdownListener the listener that will be called on shutdown.
    */
-  public void registerShutdownListener(ClientHandle client,
+  public int registerShutdownListener(ClientHandle client,
                                        ShutdownListener shutdownListener) {
-    throw new NotYetImplementedException();
-    /***
-     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     */
-
+    if (client == null) return -1;
+    if (!client.isValid()) return -1;
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+    return registerShutdownListenerN(clientHandleN, shutdownListener);
   }
+
+  private native static int registerShutdownListenerN(long client, ShutdownListener shutdownListener);
+
 
 
   // jack.h line 377
@@ -579,6 +581,10 @@ public class Jack {
   public int connect(ClientHandle client,
                      String sourcePort,
                      String destinationPort) {
+    /** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * @Todo Next
+     *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
     throw new NotYetImplementedException();
   }
   // jack.h - line 1024

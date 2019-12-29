@@ -549,6 +549,9 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerShutdownListenerN
         return -1;
     }
 
+    // cache a pointer to the Java machine, for use in the `localShutdownCallback` routine.
+    env->GetJavaVM(&jvm);
+
     // pin the process Listener Object, so it will not be garbage collected.
     shutdownListener = env->NewGlobalRef(newListener);
 

@@ -1,14 +1,9 @@
 package jackAudio4Java;
 
-import jackAudio4Java.types.ClientHandle;
-import jackAudio4Java.types.Int;
-import jackAudio4Java.types.OpenOption;
-import jackAudio4Java.types.OpenStatus;
+import jackAudio4Java.types.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -137,6 +132,39 @@ public class JackBasicTest {
     assertThat(client.isValid()).isFalse();
   }
 
+  /**
+   * A client shall be able to register and use a __ShutdownListener__.
+   *
+   * We will open a new client , register the listener than ask the operator to close the JACK connection kit
+   * (through qjackctl) The operator shall verfy that he sees the message "... Hooray! The onShutdown was called".
+   *
+   * @throws InterruptedException we'll sleep for a short while, this exception should never be thrown.
+   */
+  @Test
+  public void ClientRegisterShutdownListener() throws InterruptedException {
+
+
+    OpenStatus returnStatus = new OpenStatus();
+
+    ClientHandle client = Jack.server().clientOpen("ShutdownListenerTest", new OpenOption[]{}, returnStatus, null);
+    assertThat(client).isNotNull();
+    assertThat(client.isValid()).isTrue();
+    assertThat(returnStatus.hasFailure()).isFalse();
+
+    TestShutdownListener testShutdownListener = new TestShutdownListener();
+    assertThat(testShutdownListener.count).isEqualTo(0);
+
+    Jack.server().registerShutdownListener(client, testShutdownListener);
+
+    System.out.println("Please close the Jack server within the next 5 seconds....");
+    Thread.sleep(5000);
+
+    if(testShutdownListener.count == 0 ){
+      Jack.server().clientClose(client);
+    }
+
+  }
+
   @Test(expected = java.util.regex.PatternSyntaxException.class)
   public void throwWrongPattern() {
      Jack.verifyPattern("*1");
@@ -147,6 +175,26 @@ public class JackBasicTest {
     Jack.verifyPattern("1*");
     Jack.verifyPattern(null);
 
+  }
+
+  /**
+   * A ShutdownListener that simply counts the number of times,
+   * the `onShutdown` function has been called.
+   */
+  private static class TestShutdownListener implements ShutdownListener {
+    /**
+     * The counter.
+     * <p>
+     * Please note, that for the sake of simplicity, no provision have been made to ensure
+     * thread safety.
+     */
+    long count = 0;
+
+    @Override
+    public void onShutdown() {
+      System.out.println("... Hooray! The onShutdown was called.");
+      count++;
+    }
   }
 
 }
