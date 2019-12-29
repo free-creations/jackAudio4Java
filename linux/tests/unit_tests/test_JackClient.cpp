@@ -151,6 +151,26 @@ TEST_F(JackTestClient, registerProcessListener) {
 /**
  * A client can register a ProcessListener.
  */
+TEST_F(JackTestClient, registerShutdownListener) {
+    NiceMock<JNIEnvMock> jniEnvMock;
+    _jobject newListener;
+    _jmethodID shutdownListener_onShutdown;
+
+    // make the jniEnvMock return a non null value for GetMethodID
+    ON_CALL(jniEnvMock, GetMethodID(_, _, _))
+            .WillByDefault(Return(&shutdownListener_onShutdown));
+
+    jint error = Java_jackAudio4Java_Jack_registerShutdownListenerN(&jniEnvMock, nullptr, clientHandle, &newListener);
+    spdlog::info("You may stop Jack within the next 10 seconds to see the \"localShutdownCallback\" message.");
+    sleep(10);
+
+    EXPECT_EQ(error, 0);
+}
+
+
+/**
+ * A client can be activated and deactivated.
+ */
 TEST_F(JackTestClient, activateDeactivate) {
     jint error;
     error = Java_jackAudio4Java_Jack_activateN(nullptr, nullptr, clientHandle);

@@ -123,7 +123,7 @@ TEST_F(JackTest, invalidClientClose) {
 /**
  * When attempting to close a NULL client, an error code should be returned.
  * Note: an attempt to call "clientClose" with any invalid value other than
- * zero will result in a segment fault!
+ * zero will result in a crash with segment fault! @todo How can we trap such crashes and issue a reasonable error.
  */
 TEST_F(JackTest, clientOpenClose) {
 

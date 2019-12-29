@@ -327,12 +327,26 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_portUnregisterN
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
  */
 static jmethodID processListener_onProcess = nullptr;
+
+/**
+ * Pointer to the java `onShutdown` callback.
+ * It is allocated in procedure
+ * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ */
+static jmethodID shutdownListener_onShutdown = nullptr;
 /**
  * Pointer to the java process listener object.
  * It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
  */
 static jobject processListener = nullptr;
+
+/**
+ * Pointer to the java shutdown listener object.
+ * It is allocated in procedure
+ * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ */
+static jobject shutdownListener = nullptr;
 /**
  * Pointer to the java virtual machine. It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
@@ -356,7 +370,7 @@ static thread::id jackCallbackThreadId;
  * Attaching a thread to the Java virtual machine is very costly.
  *
  * Doing this in each audio cycle would cause XRuns even with 256 Frames/Period.
- * Therefore we cache the JNIEnv on the first invocation of processCallback.
+ * Therefore we cache the JNIEnv on the first invocation of localProcessCallback.
  *
  * @return the JNI-Environment pointer for the current thread.
  */
@@ -382,14 +396,23 @@ JNIEnv *getJNIEnvForCallbackThread() {
 }
 
 /**
-  * The process callback for this JACK application is called in a
-  * special realtime thread once for each audio cycle.
-  * The native callback delegates to the "onProcess" method
-  * defined in the java "ProcessListener" object.
-  * @param nframes number of frames to process
-  * @return zero on success, non-zero on error
-  */
-int processCallback(jack_nframes_t nframes, void *) {
+ * The local process callback intercepts the callbacks from JACK
+ * and maps these into the corresponding java calls.
+ *
+ * The process callback for this JACK application is called in a
+ * special realtime thread once for each audio cycle.
+ * The native callback delegates to the "onProcess" method
+ * defined in the java "ProcessListener" object.
+ *
+ * @param nframes number of frames to process
+ * @return zero on success, non-zero on error
+ */
+int localProcessCallback(jack_nframes_t nframes, void *) {
+
+    if (processListener == nullptr) {
+        // java callback routine not set...
+        return -1;
+    }
 
     if (processListener_onProcess == nullptr) {
         // java callback routine not set...
@@ -399,7 +422,7 @@ int processCallback(jack_nframes_t nframes, void *) {
     JNIEnv *env = getJNIEnvForCallbackThread();
     jint result;
     if (env) {
-        // here we go... now we call the Java implementation of the processCallback.
+        // here we go... now we call the Java implementation of the ProcessCallback.
         result = env->CallIntMethod(processListener, processListener_onProcess, nframes);
     } else {
         result = -1;
@@ -418,13 +441,13 @@ int processCallback(jack_nframes_t nframes, void *) {
  * NOTE: this function cannot be called while the client is active
  * (after {@link #activate(ClientHandle)} has been called.)
  *
- * @param client          an opaque handle representing this client.
- * @param processListener the listener that will be called for each process cycle.
- * @return 0 on success, otherwise a non-zero error code.
- *
  * Class:     jackAudio4Java_Jack
  * Method:    registerProcessListenerN
  * Signature: (JLjackAudio4Java/types/ProcessListener;)I
+ *
+ * @param client          an opaque handle representing this client.
+ * @param newListener     the listener that will be called for each process cycle.
+ * @return 0 on success, otherwise a non-zero error code.
  */
 JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
         (JNIEnv *env, jclass, jlong client, jobject newListener) {
@@ -441,16 +464,112 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
     // pin the process Listener Object, so it will not be garbage collected.
     processListener = env->NewGlobalRef(newListener);
 
-    // cache the method identifier, for use in the "getJNIEnvForCallbackThread" routine.
+    // cache the method identifier, for use in the "localProcessCallback" routine.
     jclass clazz = env->GetObjectClass(processListener);
     processListener_onProcess = env->GetMethodID(clazz, "onProcess", "(I)I");
     if (processListener_onProcess == nullptr) {
         SPDLOG_ERROR("Could not register the Process Listener.");
         return -1;
     }
-    return jack_set_process_callback(reinterpret_cast<jack_client_t *>(client), processCallback, nullptr);
+    return jack_set_process_callback(reinterpret_cast<jack_client_t *>(client), localProcessCallback, nullptr);
 
 }
+/**
+ * The local shutdown callback intercepts the callbacks from JACK
+ * and maps these into the corresponding java calls.
+ *
+ */
+void localShutdownCallback(void *) {
+    SPDLOG_TRACE("localShutdownCallback");
+
+    if (shutdownListener == nullptr) {
+        SPDLOG_ERROR("java shutdown-listener object not set...");
+        return;
+    }
+    if (shutdownListener_onShutdown == nullptr) {
+        SPDLOG_ERROR("java onShutdown callback routine not set...");
+        return;
+    }
+
+    if (jvm == nullptr) {
+        SPDLOG_ERROR("jvm is NULL");
+        return;
+    }
+    JNIEnv *env;
+    jint success = jvm->AttachCurrentThread((void **) &env, NULL);
+    if (success != JNI_OK) {
+        SPDLOG_ERROR("Could not attach to the current thread");
+        return;
+    }
+    // Everything is fine. At last, let's call the Java "onShutdown" method.
+    env->CallVoidMethod(shutdownListener, shutdownListener_onShutdown);
+}
+
+// jack.h - line 316
+/**
+ *
+ * Register a function (and argument) to be called if and when the
+ * JACK server shuts down the client thread.  The function must
+ * be written as if it were an asynchonrous POSIX signal
+ * handler --- use only async-safe functions, and remember that it
+ * is executed from another thread.  A typical function might
+ * set a flag or write to a pipe so that the rest of the
+ * application knows that the JACK client thread has shut
+ * down.
+ *
+ * NOTE: clients do not need to call this.  It exists only
+ * to help more complex clients understand what is going
+ * on.  It should be called before jack_client_activate().
+ *
+ * NOTE: if a client calls this AND jack_on_info_shutdown(), then
+ * in case of a client thread shutdown, the callback
+ * passed to this function will not be called, and the one passed to
+ * jack_on_info_shutdown() will.
+ *
+ * NOTE: application should typically signal another thread to correctly
+ * finish cleanup, that is by calling "jack_client_close"
+ * (since "jack_client_close" cannot be called directly in the context
+ * of the thread that calls the shutdown callback).
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    registerShutdownListenerN
+ * Signature: (JLjackAudio4Java/types/ShutdownListener;)I
+ *
+ * @param env pointer to the Java environment.
+ * @param client pointer to JACK client structure.
+ * @param newListener pointer to a java object which implements
+ *                    the `jackAudio4Java.types.ShutdownListener` interface.
+ * @return 0 when successful, a non zero value otherwise.
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerShutdownListenerN
+        (JNIEnv *env, jclass, jlong client, jobject newListener) {
+
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_registerShutdownListenerN");
+    if (newListener == nullptr) {
+        return -1;
+    }
+
+    // pin the process Listener Object, so it will not be garbage collected.
+    shutdownListener = env->NewGlobalRef(newListener);
+
+    // cache the method identifier, for use in the `localShutdownCallback` routine.
+    jclass clazz = env->GetObjectClass(shutdownListener);
+    shutdownListener_onShutdown = env->GetMethodID(clazz, "onShutdown", "()V");
+
+    if (shutdownListener_onShutdown == nullptr) {
+        SPDLOG_ERROR("Could not register the Shutdown Listener.");
+        return -1;
+    }
+    // install the local callback routine.
+    jack_on_shutdown(reinterpret_cast<jack_client_t *>(client), localShutdownCallback, nullptr);
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_registerShutdownListenerN - done");
+
+    return 0;
+}
+
+
+
+
 
 // jack.h - line 668
 
@@ -555,7 +674,7 @@ JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
     if (typeNamePatternN) env->ReleaseStringUTFChars(typeNamePatternJ, typeNamePatternN);
     if (portNamePatternN) env->ReleaseStringUTFChars(portNamePatternJ, portNamePatternN);
 
-    if(ports == nullptr) return nullptr;
+    if (ports == nullptr) return nullptr;
 
     int count = portCount(ports);
     if (count == 0) {
