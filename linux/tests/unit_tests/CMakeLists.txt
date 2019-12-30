@@ -27,6 +27,7 @@ set(target_sources
         test_Jack.cpp
         test_types_Int.cpp
         test_JackClient.cpp
+        test_level2_JackPorts.cpp
         ${CMAKE_SOURCE_DIR}/tests/lib/jnimock/jnimock.cpp)
 
 add_executable(${UNIT_TEST_EXE_NAME} ${target_sources})

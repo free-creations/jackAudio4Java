@@ -482,7 +482,7 @@ public class Jack {
 
   /**
    * @param port an opaque handle representing a valid port.
-   * @return the long name of the port (including the  "client_name:" prefix).
+   * @return the long full of the port (including the  "client_name:" prefix).
    */
   public String portName(PortHandle port) {
     if (port == null) return "invalid-port";
@@ -501,8 +501,14 @@ public class Jack {
    * @return the short name of the port (not including the  "client_name:" prefix).
    */
   public String portShortName(PortHandle port) {
-    throw new NotYetImplementedException();
+    if (port == null) return "invalid-port";
+    if (!port.isValid()) return "invalid-port";
+    if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
+    InternalPortHandle internalPortHandle = (InternalPortHandle) port;
+    return portShortNameN(internalPortHandle.getReference());
   }
+  private native static String portShortNameN(long port);
+
 
   // jack.h -line 944
 

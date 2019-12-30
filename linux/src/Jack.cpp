@@ -278,7 +278,7 @@ JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_getClientNameN
  *
  * @param client     an opaque handle representing this client.
  * @param portName   non-empty _short name_ for the new port (shall not
- *                   include the leading `client_name:`). Must be unique.
+ *                   include the leading `clientName:`). Must be unique.
  * @param portType   the port-type.  See {@link PortType}
  * @param portFlags  an array of flags see:  {@link PortFlag}.
  * @param bufferSize must be non-zero if this is not a built-in
@@ -474,6 +474,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
     return jack_set_process_callback(reinterpret_cast<jack_client_t *>(client), localProcessCallback, nullptr);
 
 }
+
 /**
  * The local shutdown callback intercepts the callbacks from JACK
  * and maps these into the corresponding java calls.
@@ -695,12 +696,42 @@ JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
     return result;
 }
 
-/*
+/**
+ * Report the full name of the jack_port_t (including the
+ * "clientName:" prefix).
+ *
  * Class:     jackAudio4Java_Jack
  * Method:    portNameN
  * Signature: (J)Ljava/lang/String;
+ *
+ * @param env pointer to the Java environment.
+ * @param portHandle
+ * @return the full name of the jack port
  */
 JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_portNameN
-        (JNIEnv *env, jclass, jlong portHandle){
+        (JNIEnv *env, jclass, jlong portHandle) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portNameN");
 
+    const char *portName = jack_port_name(reinterpret_cast<jack_port_t *>( portHandle));
+    return env->NewStringUTF(portName);
 }
+/**
+ * Report the short name of the jack_port_t (not including the
+ * "clientName:" prefix).
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    portNameN
+ * Signature: (J)Ljava/lang/String;
+ *
+ * @param env pointer to the Java environment.
+ * @param portHandle
+ * @return the short name of the jack port
+ */
+JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_portShortNameN
+        (JNIEnv *env, jclass, jlong portHandle) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portShortNameN");
+
+    const char *portName = jack_port_short_name(reinterpret_cast<jack_port_t *>( portHandle));
+    return env->NewStringUTF(portName);
+}
+
