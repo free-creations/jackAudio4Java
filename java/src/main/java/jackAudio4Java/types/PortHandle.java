@@ -66,7 +66,7 @@ public class PortHandle {
    * @return the flags given when the port was created.
    */
   public PortFlag[] getFlags() {
-    return flags;
+    return PortFlag.arrayClone(flags);
   }
 
 

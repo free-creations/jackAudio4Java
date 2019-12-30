@@ -694,3 +694,13 @@ JNIEXPORT jobjectArray JNICALL Java_jackAudio4Java_Jack_getPortsN
 
     return result;
 }
+
+/*
+ * Class:     jackAudio4Java_Jack
+ * Method:    portNameN
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_portNameN
+        (JNIEnv *env, jclass, jlong portHandle){
+
+}

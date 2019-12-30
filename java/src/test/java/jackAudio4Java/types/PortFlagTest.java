@@ -24,4 +24,14 @@ public class PortFlagTest {
     PortFlag[] flags = {isPhysical, isTerminal};
     assertThat(PortFlag.arrayToLong(flags)).isEqualTo(20);
   }
+
+
+  @Test
+  public void arrayClone() {
+    PortFlag[] flags = {isPhysical, isTerminal};
+    PortFlag[] clone = PortFlag.arrayClone(flags);
+    assertThat(clone).isEqualTo(flags);
+  }
+
+
 }

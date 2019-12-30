@@ -12,7 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
  * These unit-tests check whatever can be verified without having an open connection
  * to the Jack - audio - server.
  */
-public class JackBasicTest {
+public class Jack_Level_0_Tests {
 
   @BeforeClass
   public static void initialize() {
@@ -114,7 +114,7 @@ public class JackBasicTest {
    * @throws InterruptedException we'll sleep for a short while, an exception should never be thrown.
    */
   @Test
-  public void ClientOpenClose() throws InterruptedException {
+  public void clientOpenClose() throws InterruptedException {
 
 
     OpenStatus returnStatus = new OpenStatus();
@@ -141,7 +141,7 @@ public class JackBasicTest {
    * @throws InterruptedException we'll sleep for a short while, this exception should never be thrown.
    */
   @Test
-  public void ClientRegisterShutdownListener() throws InterruptedException {
+  public void clientRegisterShutdownListener() throws InterruptedException {
 
 
     OpenStatus returnStatus = new OpenStatus();

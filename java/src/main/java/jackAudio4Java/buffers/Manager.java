@@ -15,7 +15,7 @@
  */
 package jackAudio4Java.buffers;
 
-import jackAudio4Java.NotYetImplementedException;
+import jackAudio4Java.utilities.NotYetImplementedException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

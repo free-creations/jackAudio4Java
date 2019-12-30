@@ -77,7 +77,11 @@ public enum PortFlag {
 
 
   /**
-   * Check if the given array of flags contains the item.
+   * Check if an array contains the given item.
+   *
+   * We'll use arrays to represent sets of Flags. This function
+   * simulates the member function.
+   *
    * @param flags an array of {@link PortFlag}s.
    * @param item an item to search for.
    * @return true if the item is a member of the array.
@@ -91,11 +95,24 @@ public enum PortFlag {
   }
 
   /**
-   * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   * Clone an array of flags.
    *
-   * @param flags a set of port flags
-   * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   * As the PortFlag is immutable, it is sufficient to make a shallow clone.
+   *
+   * @param flags the array that shall be copied.
+   * @return a copy of the given array.
    */
+  public static PortFlag[] arrayClone(PortFlag[] flags) {
+    return flags.clone();
+  }
+
+
+    /**
+     * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+     *
+     * @param flags a set of port flags
+     * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+     */
   public static long arrayToLong(PortFlag[] flags) {
     if(flags == null) return 0;
     long result = 0;

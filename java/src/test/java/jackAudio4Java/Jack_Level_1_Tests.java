@@ -16,7 +16,7 @@ import static jackAudio4Java.types.PortFlag.isPhysical;
  * the Jack - audio - server. Or, in other words, these are verifications that rely on the existence of a _valid
  * client handle_.
  */
-public class JackClientTest {
+public class Jack_Level_1_Tests {
   private static ClientHandle client;
   private static final String clientName = "JackClientÜÄÖéè"; // use a name with diacritics
 
@@ -103,7 +103,7 @@ public class JackClientTest {
     error = Jack.server().deactivate(client);
     assertThat(error).isEqualTo(0);
 
-    Thread.sleep(50); // let it cool down... (our test bed is not really thread save)
+    Thread.sleep(50); // let it cool down... (remember, our test bed is not really thread save)
 
     // verify, that the process Listener has been called several times during the activation.
     assertThat(testProcessListener.count).isGreaterThan(10);

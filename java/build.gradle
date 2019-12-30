@@ -5,7 +5,8 @@ plugins {
 
   //Performs quality checks on the project's Java source files using
   // SpotBugs (former FindBugs) and generates reports from these checks
-  id 'com.github.spotbugs' version '2.0.0'
+  // see https://spotbugs.github.io/
+  id 'com.github.spotbugs' version '3.0.0'
 
   // Plug-in that computes version information from the Git.
   id 'net.nemerosa.versioning' version '2.6.1'

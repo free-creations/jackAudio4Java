@@ -18,6 +18,8 @@ package jackAudio4Java;
 import jackAudio4Java.buffers.InternalAudioSlice;
 import jackAudio4Java.buffers.MutableAudioSlice;
 import jackAudio4Java.types.*;
+import jackAudio4Java.utilities.NotYetImplementedException;
+import jackAudio4Java.utilities.SuppressFBWarnings;
 
 import java.nio.FloatBuffer;
 import java.util.logging.Level;
@@ -229,6 +231,7 @@ public class Jack {
   public int clientClose(ClientHandle client) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     long reference = internalClientHandle.getReference();
     internalClientHandle.invalidate();
@@ -268,6 +271,8 @@ public class Jack {
     final String invalidClient = "Invalid Client";
     if (client == null) return invalidClient;
     if (!client.isValid()) return invalidClient;
+
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return getClientNameN(internalClientHandle.getReference());
 
@@ -287,6 +292,7 @@ public class Jack {
   public int activate(ClientHandle client) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return activateN(internalClientHandle.getReference());
   }
@@ -306,6 +312,7 @@ public class Jack {
   public int deactivate(ClientHandle client) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     InternalClientHandle internalClientHandle = (InternalClientHandle) client;
     return deactivateN(internalClientHandle.getReference());
   }
@@ -336,15 +343,15 @@ public class Jack {
    * @param shutdownListener the listener that will be called on shutdown.
    */
   public int registerShutdownListener(ClientHandle client,
-                                       ShutdownListener shutdownListener) {
+                                      ShutdownListener shutdownListener) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
     return registerShutdownListenerN(clientHandleN, shutdownListener);
   }
 
   private native static int registerShutdownListenerN(long client, ShutdownListener shutdownListener);
-
 
 
   // jack.h line 377
@@ -367,6 +374,7 @@ public class Jack {
                                      ProcessListener processListener) {
     if (client == null) return -1;
     if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
     return registerProcessListenerN(clientHandleN, processListener);
   }
@@ -423,6 +431,7 @@ public class Jack {
                                  PortFlag[] portFlags,
                                  long bufferSize) {
     long portFlagsN = PortFlag.arrayToLong(portFlags);
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
 
     long portHandleN = portRegisterN(clientHandleN, portName, portType.toString(), portFlagsN, bufferSize);
@@ -454,7 +463,10 @@ public class Jack {
     if (port == null) return -1;
     if (!port.isValid()) return -1;
 
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
+
+    if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     long portHandleN = internalPortHandle.getReference();
 
@@ -465,6 +477,32 @@ public class Jack {
   }
 
   private native static int portUnregisterN(long client, long port);
+
+  // jack.h -line 783
+
+  /**
+   * @param port an opaque handle representing a valid port.
+   * @return the long name of the port (including the  "client_name:" prefix).
+   */
+  public String portName(PortHandle port) {
+    if (port == null) return "invalid-port";
+    if (!port.isValid()) return "invalid-port";
+    if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
+    InternalPortHandle internalPortHandle = (InternalPortHandle) port;
+    return portNameN(internalPortHandle.getReference());
+  }
+
+  private native static String portNameN(long port);
+
+  // jack.h -line 790
+
+  /**
+   * @param port an opaque handle representing a valid port.
+   * @return the short name of the port (not including the  "client_name:" prefix).
+   */
+  public String portShortName(PortHandle port) {
+    throw new NotYetImplementedException();
+  }
 
   // jack.h -line 944
 
@@ -524,6 +562,8 @@ public class Jack {
       throw new RuntimeException(port.getName() + " is not an audio port");
     if (!PortFlag.arrayContains(port.getFlags(), PortFlag.isInput))
       throw new RuntimeException(port.getName() + " is not an input port");
+
+    if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     long portHandleN = internalPortHandle.getReference();
 
@@ -657,7 +697,7 @@ public class Jack {
   }
 
   /**
-   * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with a invalid regex pattern
+   * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with an invalid regex pattern
    * like "*1".
    * This function verifies the given pattern and throws java.util.regex.PatternSyntaxException
    * if the pattern is invalid.
@@ -665,6 +705,7 @@ public class Jack {
    * @param regex the regex pattern to be tested.
    * @throws java.util.regex.PatternSyntaxException if the pattern is invalid.
    */
+  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "We'll ignore the compiled pattern.")
   static void verifyPattern(String regex) {
     if (regex != null) {
       final Pattern ignore = Pattern.compile(regex);
