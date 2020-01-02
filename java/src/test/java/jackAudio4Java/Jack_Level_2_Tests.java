@@ -59,7 +59,7 @@ public class Jack_Level_2_Tests {
 
 
   /**
-   * The function `Jack.portName` shall return the name of the port.
+   * The function `Jack.portName` shall return the full name of the port.
    */
   @Test
   public void getPortName() {
@@ -68,7 +68,7 @@ public class Jack_Level_2_Tests {
   }
 
   /**
-   * The function `Jack.portShortName` shall return the name of the port.
+   * The function `Jack.portShortName` shall return the short name of the port.
    */
   @Test
   public void getPortShortName() {
