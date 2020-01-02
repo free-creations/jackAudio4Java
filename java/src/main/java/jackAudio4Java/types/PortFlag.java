@@ -15,6 +15,10 @@
  */
 package jackAudio4Java.types;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public enum PortFlag {
 
   /**
@@ -78,47 +82,60 @@ public enum PortFlag {
 
   /**
    * Check if an array contains the given item.
-   *
+   * <p>
    * We'll use arrays to represent sets of Flags. This function
    * simulates the member function.
    *
    * @param flags an array of {@link PortFlag}s.
-   * @param item an item to search for.
+   * @param item  an item to search for.
    * @return true if the item is a member of the array.
+   * @deprecated we'll use sets.
    */
   public static boolean arrayContains(PortFlag[] flags, PortFlag item) {
-    if(flags == null) return false;
+    if (flags == null) return false;
     for (PortFlag f : flags) {
       if (f == item) return true;
     }
     return false;
   }
 
+
   /**
-   * Clone an array of flags.
+   * Convenience function that provides a kind of Set literal  constructor.
+   * Use it like so:
+   * ```
+   * Jack.server().getPorts(client,null, null, PortFlag.setOf(isPhysical ,isOutput));
+   * ```
    *
-   * As the PortFlag is immutable, it is sufficient to make a shallow clone.
-   *
-   * @param flags the array that shall be copied.
-   * @return a copy of the given array.
+   * @param flags a list of flags
+   * @return a set of all flags contained in the list.
    */
-  public static PortFlag[] arrayClone(PortFlag[] flags) {
-    return flags.clone();
+  public static Set<PortFlag> setOf(PortFlag... flags) {
+    Set<PortFlag> set = new HashSet<>();
+    Collections.addAll(set, flags);
+    return Collections.unmodifiableSet(set);
+  }
+  /**
+   * Convenience function.
+   * @return an immutable empty set of type Set<PortFlag>
+   */
+  public static Set<PortFlag> emptySet() {
+    return Collections.emptySet();
   }
 
-
-    /**
-     * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
-     *
-     * @param flags a set of port flags
-     * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
-     */
-  public static long arrayToLong(PortFlag[] flags) {
-    if(flags == null) return 0;
+  /**
+   * Builds a single Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   *
+   * @param flags a set of port flags
+   * @return an Integer resulting by  OR-ing together the integer values of the flags in the given set.
+   */
+  public static long setToLong(Set<PortFlag> flags) {
+    if (flags == null) return 0;
     long result = 0;
     for (PortFlag flag : flags) {
       result = result | flag.getBits();
     }
     return result;
   }
+
 }

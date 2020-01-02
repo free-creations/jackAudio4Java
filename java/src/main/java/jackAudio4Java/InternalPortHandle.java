@@ -20,12 +20,14 @@ import jackAudio4Java.types.PortFlag;
 import jackAudio4Java.types.PortHandle;
 import jackAudio4Java.types.PortType;
 
+import java.util.Set;
+
 /**
  * Instances of this class shall not be created by any object other than {@link Jack}.
  */
 class InternalPortHandle extends PortHandle {
 
-  InternalPortHandle(long reference, String portName, PortType portType, PortFlag[] portFlags) {
+  InternalPortHandle(long reference, String portName, PortType portType, Set<PortFlag> portFlags) {
     super ( reference,  portName,  portType,  portFlags);
   }
 

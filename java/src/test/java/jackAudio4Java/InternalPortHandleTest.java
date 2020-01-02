@@ -6,12 +6,15 @@ import jackAudio4Java.types.PortType;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static com.google.common.truth.Truth.assertThat;
+import static jackAudio4Java.types.PortFlag.isPhysical;
 
 public class InternalPortHandleTest {
 
   private PortHandle candidate;
-  private PortFlag[] flags = {PortFlag.isPhysical};
+  private Set<PortFlag> flags = PortFlag.setOf(isPhysical);
 
   @Before
   public void setUp() throws Exception {

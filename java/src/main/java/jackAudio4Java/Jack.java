@@ -22,11 +22,14 @@ import jackAudio4Java.utilities.NotYetImplementedException;
 import jackAudio4Java.utilities.SuppressFBWarnings;
 
 import java.nio.FloatBuffer;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
- * use it like this:
+ * Here is a simple code example that queries the Jack server for its version number.
  * ```
  * Int major = new Int(-1);
  * Int minor = new Int(-1);
@@ -420,7 +423,7 @@ public class Jack {
    * @param portName   non-empty _short name_ for the new port (shall not
    *                   include the leading `client_name:`). Must be unique.
    * @param portType   the port-type.  See {@link PortType}
-   * @param portFlags  an array of flags see:  {@link PortFlag}.
+   * @param portFlags  an set of flags see:  {@link PortFlag}.
    * @param bufferSize must be non-zero if this is not a built-in
    *                   port type (see {@link PortType}).  Otherwise, it is ignored.
    * @return a port handle on success, otherwise `null`.
@@ -428,9 +431,9 @@ public class Jack {
   public PortHandle portRegister(ClientHandle client,
                                  String portName,
                                  PortType portType,
-                                 PortFlag[] portFlags,
+                                 Set<PortFlag> portFlags,
                                  long bufferSize) {
-    long portFlagsN = PortFlag.arrayToLong(portFlags);
+    long portFlagsN = PortFlag.setToLong(portFlags);
     if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
 
@@ -566,7 +569,7 @@ public class Jack {
     if (!port.isValid()) return -1;
     if (!port.getType().equals(PortType.defaultAudio()))
       throw new RuntimeException(port.getName() + " is not an audio port");
-    if (!PortFlag.arrayContains(port.getFlags(), PortFlag.isInput))
+    if (!port.getFlags().contains(PortFlag.isInput))
       throw new RuntimeException(port.getName() + " is not an input port");
 
     if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
@@ -617,22 +620,33 @@ public class Jack {
    * When a connection exists, data written to the __source port__ will
    * be available to be read at the __destination port__.
    * <p>
+   * ## Preconditions
    * - The _port-types_ must be identical.
    * - The  {@link PortFlag} of the __source_port__ must include {@link PortFlag#isOutput}.
    * - The  {@link PortFlag}  of the __destination_port__ must include {@link PortFlag#isInput}.
    *
+   * ## Native function reference
+   * see `int jack_connect(jack_client_t, const char *, const char *)` at line 993 in jack.h
+   *
+   * @param client an opaque handle representing this client.
+   * @param sourcePort the  name of the source port.
+   * @param destinationPort the  name of the destination port.
    * @return 0 on success, EEXIST if the connection is already made,
-   * otherwise a non-zero error code
+   *         otherwise a non-zero error code
+   *
    */
   public int connect(ClientHandle client,
                      String sourcePort,
                      String destinationPort) {
-    /** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * @Todo Next
-     *  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     */
-    throw new NotYetImplementedException();
+    if (client == null) return -1;
+    if (!client.isValid()) return -1;
+    if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
+    long clientHandleN = ((InternalClientHandle) client).getReference();
+    return connectN(clientHandleN, sourcePort,destinationPort);
   }
+
+  private native static int connectN(long client, String sourcePort, String destinationPort);
+
   // jack.h - line 1024
 
   /**
@@ -683,10 +697,12 @@ public class Jack {
    * @return an array of port-names that match the specified
    * arguments. If no match is found, an empty array will be returned.
    */
+
+
   public String[] getPorts(ClientHandle client,
                            String portNamePattern,
                            String typeNamePattern,
-                           PortFlag[] portFlags) {
+                           Set<PortFlag> portFlags) {
     String[] empty = new String[]{};
 
     long clientHandleN = InternalClientHandle.getReferenceFrom(client);
@@ -695,13 +711,17 @@ public class Jack {
     verifyPattern(portNamePattern);
     verifyPattern(typeNamePattern);
 
-    long portFlagsN = PortFlag.arrayToLong(portFlags);
+    long portFlagsN = PortFlag.setToLong(portFlags);
     String[] result = getPortsN(clientHandleN, portNamePattern, typeNamePattern, portFlagsN);
     if (result == null) return empty;
 
     return result;
   }
 
+  private static native String[] getPortsN(long client,
+                                           String portNamePattern,
+                                           String typeNamePattern,
+                                           long flags);
   /**
    * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with an invalid regex pattern
    * like "*1".
@@ -718,8 +738,5 @@ public class Jack {
     }
   }
 
-  private static native String[] getPortsN(long client,
-                                           String portNamePattern,
-                                           String typeNamePattern,
-                                           long flags);
+
 }

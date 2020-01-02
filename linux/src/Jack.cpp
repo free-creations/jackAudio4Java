@@ -345,6 +345,7 @@ static jobject processListener = nullptr;
  * Pointer to the java shutdown listener object.
  * It is allocated in procedure
  * `Java_jackAudio4Java_Jack_registerProcessListenerN`.
+ * @ToDo investigate whether we better pass this as last argument in jack_on_shutdown call. see also localShutdownCallback
  */
 static jobject shutdownListener = nullptr;
 /**
@@ -478,7 +479,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerProcessListenerN
 /**
  * The local shutdown callback intercepts the callbacks from JACK
  * and maps these into the corresponding java calls.
- *
+  * @ToDo investigate whether we better get shutdownListener from the void argument.
  */
 void localShutdownCallback(void *) {
     SPDLOG_TRACE("localShutdownCallback");
@@ -553,7 +554,7 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_registerShutdownListenerN
     // cache a pointer to the Java machine, for use in the `localShutdownCallback` routine.
     env->GetJavaVM(&jvm);
 
-    // pin the process Listener Object, so it will not be garbage collected.
+    // pin and than cache the process Listener Object, so it will not be garbage collected.
     shutdownListener = env->NewGlobalRef(newListener);
 
     // cache the method identifier, for use in the `localShutdownCallback` routine.

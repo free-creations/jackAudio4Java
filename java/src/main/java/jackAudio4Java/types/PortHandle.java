@@ -15,6 +15,9 @@
  */
 package jackAudio4Java.types;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * PortHandle stores a _native address_ to a port.
  *
@@ -27,26 +30,32 @@ public class PortHandle {
    * The native address of this port.
    * <p>
    * Only the class InternalPortHandle
-   * shall have access to this item.
+   * shall have write access to this item.
+   * <p>
+   *   Note: there may be several handle objects representing the same physical port.
+   * </p>
    */
   protected volatile long reference;
 
   private final String name;
   private final PortType type;
-  private final PortFlag[] flags;
+  private final Set<PortFlag> flags;
 
-  protected PortHandle(long reference, String portName, PortType portType, PortFlag[] portFlags) {
+  protected PortHandle(long reference, String portName, PortType portType, Set<PortFlag> portFlags) {
     this.reference = reference;
     this.name = portName;
     this.type = portType;
-    this.flags = portFlags;
+    this.flags = Collections.unmodifiableSet(portFlags);
   }
 
   /**
    * Returns the name given when the port was created.
    *
    * @return the name given when the port was created.
+   * @deprecated the name might change during the lifetime of a port. Use `Jack().portName(portHandle)` to enquire the
+   * ports name.
    */
+  @Deprecated
   public String getName() {
     return name;
   }
@@ -65,15 +74,20 @@ public class PortHandle {
    *
    * @return the flags given when the port was created.
    */
-  public PortFlag[] getFlags() {
-    return PortFlag.arrayClone(flags);
+  public Set<PortFlag> getFlags() {
+    return flags;
   }
 
 
   /**
    * A port handle is considered valid, if it is not referencing a null pointer.
    *
-   * @return true if the handle is referencing an existing port.
+   * @toDo note, there is no guarantee that a non-null reference still points to an existing port.
+   *       A once valid port-reference might have been unregistered for example. Does Jack
+   *       crash when we query for the  port-name of such a reference? In the future object oriented
+   *       interface, we might better use jack_port_id_t (received through the port registration callback)
+   *       to identify the port- object.
+   * @return true if the handle may reference an existing port.
    */
   public boolean isValid() {
     return (reference != 0);

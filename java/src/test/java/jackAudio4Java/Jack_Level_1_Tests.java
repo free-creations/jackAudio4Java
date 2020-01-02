@@ -58,7 +58,7 @@ public class Jack_Level_1_Tests {
   @Test
   public void portRegisterUnregister() {
     final String portName = "testPort";
-    PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(), new PortFlag[]{PortFlag.isInput}, 0);
+    PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(), PortFlag.setOf(PortFlag.isInput), 0);
     assertThat(port).isNotNull();
     assertThat(port.isValid()).isTrue();
 
@@ -129,7 +129,7 @@ public class Jack_Level_1_Tests {
   public void getPorts() {
     String[] portNames =
             Jack.server().getPorts(client, null, PortType.defaultAudio().toString(),
-                    new PortFlag[]{isPhysical, isOutput});
+                    PortFlag.setOf(isPhysical, isOutput));
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isAtLeast(1);
     for (String name : portNames) {
@@ -142,7 +142,7 @@ public class Jack_Level_1_Tests {
    */
   @Test
   public void getPortsImpossible() {
-    String[] portNames = Jack.server().getPorts(client, "impossible", null, null);
+    String[] portNames = Jack.server().getPorts(client, "impossible", null, PortFlag.emptySet());
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isEqualTo(0);
   }
