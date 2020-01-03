@@ -18,22 +18,7 @@ public class InternalPortHandleTest {
 
   @Before
   public void setUp() throws Exception {
-    candidate = new InternalPortHandle(123, "testPort", PortType.defaultAudio(), flags);
-  }
-
-  @Test
-  public void getName() {
-    assertThat(candidate.getName()).isEqualTo("testPort");
-  }
-
-  @Test
-  public void getType() {
-    assertThat(candidate.getType()).isEqualTo(PortType.defaultAudio());
-  }
-
-  @Test
-  public void getFlags() {
-    assertThat(candidate.getFlags()).isEqualTo(flags);
+    candidate = new InternalPortHandle(123);
   }
 
   @Test

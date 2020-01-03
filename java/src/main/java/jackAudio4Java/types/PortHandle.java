@@ -38,46 +38,12 @@ public class PortHandle {
    */
   protected volatile long reference;
 
-  private final String name = null;
-  private final PortType type = null;
-  private final Set<PortFlag> flags = null;
 
-
-  protected PortHandle(long reference, String portName, PortType portType, Set<PortFlag> portFlags) {
+  protected PortHandle(long reference) {
     this.reference = reference;
   }
 
-  /**
-   * Returns the name given when the port was created.
-   *
-   * @return the name given when the port was created.
-   * @deprecated the name might change during the lifetime of a port. Use `Jack().portName(portHandle)` to enquire the
-   * ports name.
-   */
-  @Deprecated
-  public String getName() {
-    return name;
-  }
 
-  /**
-   * Returns the type of this port.
-   * @deprecated there are cases where might have a handle without knowing the type.
-   * @return the type of this port.
-   */
-  @Deprecated
-  public PortType getType() {
-    return type;
-  }
-
-  /**
-   * Returns the flags given when the port was created.
-   * @deprecated there are cases where might have a handle without knowing the type.
-   * @return the flags given when the port was created.
-   */
-  @Deprecated
-  public Set<PortFlag> getFlags() {
-    return flags;
-  }
 
   @Override
   public boolean equals(Object o) {

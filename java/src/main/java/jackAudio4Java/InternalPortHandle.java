@@ -27,13 +27,10 @@ import java.util.Set;
  */
 class InternalPortHandle extends PortHandle {
 
-  @Deprecated
-  InternalPortHandle(long reference, String portName, PortType portType, Set<PortFlag> portFlags) {
-    super ( reference,  portName,  portType,  portFlags);
-  }
+
 
   InternalPortHandle(long reference) {
-    super ( reference,  null,  null,  null);
+    super (reference);
   }
 
   long getReference() {

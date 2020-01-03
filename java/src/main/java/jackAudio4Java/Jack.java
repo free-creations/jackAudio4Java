@@ -443,7 +443,7 @@ public class Jack {
     if (portHandleN == 0) {
       return null;
     }
-    return new InternalPortHandle(portHandleN, portName, portType, portFlags);
+    return new InternalPortHandle(portHandleN);
   }
 
   private native static long portRegisterN(long client,
@@ -569,11 +569,14 @@ public class Jack {
   public int portGetAudioData(PortHandle port, MutableAudioSlice inputContainer) {
     if (port == null) return -1;
     if (!port.isValid()) return -1;
+/*
+
     if (!port.getType().equals(defaultAudio()))
       throw new RuntimeException(port.getName() + " is not an audio port");
     if (!port.getFlags().contains(isInput))
       throw new RuntimeException(port.getName() + " is not an input port");
 
+*/
     if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     long portHandleN = internalPortHandle.getReference();
