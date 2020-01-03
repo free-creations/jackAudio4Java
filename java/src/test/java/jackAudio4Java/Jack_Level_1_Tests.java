@@ -68,6 +68,41 @@ public class Jack_Level_1_Tests {
   }
 
   /**
+   * When trying to use an invalid port handle, the system should react reasonably.
+   * We'll demonstrate that, by using a port-handle of a defunct port.
+   */
+  @Test
+  public void accessInvalidPorts() {
+    final String portName = "testPort_2";
+    // create a new handle
+    PortHandle port = Jack.server().portRegister(client, portName, defaultAudio(), setOf(isInput), 0);
+    // kill the port
+    Jack.server().portUnregister(client, port);
+    // try to do something with the handle pointing to the now non-existent port
+    assertThat(Jack.server().portShortName(port)).isEqualTo("invalid-port");
+  }
+
+  /**
+   * When trying to use an invalid port handle, the system should react reasonably.
+   * We'll evaluate that, by using a port-handle of a defunct port.
+   */
+  @Test
+  public void accessInvalidPorts_2() {
+    final String portName = "testPort_3";
+    // create a first port handle
+    PortHandle handle_1 =  Jack.server().portRegister(client, portName, defaultAudio(), setOf(isInput), 0);
+    // create a second handle pointing to the same port
+    PortHandle handle_2 = Jack.server().portByName(client, clientName+":"+portName);
+    // kill the port using handle_1
+    Jack.server().portUnregister(client, handle_1);
+    // now handle_1 is invalid but unfortunately handle_2 is not.
+    assertThat(handle_1.isValid()).isFalse();
+    assertThat(handle_2.isValid()).isTrue();
+
+    // try to do something with the handle_2 pointing to the now non-existent port
+    assertThat(Jack.server().portShortName(handle_2)).isEqualTo("testPort_3");
+  }
+  /**
    * A client can be activated and can be deactivated.
    */
   @Test
@@ -109,6 +144,8 @@ public class Jack_Level_1_Tests {
     assertThat(testProcessListener.count).isGreaterThan(10);
 
   }
+
+
 
   /**
    * The sample rate for a client should be within a plausible range of

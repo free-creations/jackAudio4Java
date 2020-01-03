@@ -22,8 +22,6 @@ import jackAudio4Java.utilities.NotYetImplementedException;
 import jackAudio4Java.utilities.SuppressFBWarnings;
 
 import java.nio.FloatBuffer;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -513,6 +511,7 @@ public class Jack {
     InternalPortHandle internalPortHandle = (InternalPortHandle) port;
     return portShortNameN(internalPortHandle.getReference());
   }
+
   private native static String portShortNameN(long port);
 
 
@@ -627,16 +626,15 @@ public class Jack {
    * - The _port-types_ must be identical.
    * - The  {@link PortFlag} of the __source_port__ must include {@link PortFlag#isOutput}.
    * - The  {@link PortFlag}  of the __destination_port__ must include {@link PortFlag#isInput}.
-   *
+   * <p>
    * ## Native function reference
    * see `int jack_connect(jack_client_t, const char *, const char *)` at line 993 in jack.h
    *
-   * @param client an opaque handle representing this client.
-   * @param sourcePort the  name of the source port.
+   * @param client          an opaque handle representing this client.
+   * @param sourcePort      the  name of the source port.
    * @param destinationPort the  name of the destination port.
    * @return 0 on success, EEXIST if the connection is already made,
-   *         otherwise a non-zero error code
-   *
+   * otherwise a non-zero error code
    */
   public int connect(ClientHandle client,
                      String sourcePort,
@@ -645,7 +643,7 @@ public class Jack {
     if (!client.isValid()) return -1;
     if (!(client instanceof InternalClientHandle)) throw new RuntimeException("Invalid client handle");
     long clientHandleN = ((InternalClientHandle) client).getReference();
-    return connectN(clientHandleN, sourcePort,destinationPort);
+    return connectN(clientHandleN, sourcePort, destinationPort);
   }
 
   private native static int connectN(long client, String sourcePort, String destinationPort);
@@ -725,6 +723,29 @@ public class Jack {
                                            String portNamePattern,
                                            String typeNamePattern,
                                            long flags);
+
+  /**
+   * Get a port handle for a named port.
+   * <p>
+   * ## Native function reference
+   * see `jack_port_t * jack_port_by_name (jack_client_t *client, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;`
+   * at line 1292 in jack.h
+   *
+   * @param client   A valid client handle.
+   * @param portName the name to search for.
+   * @return a valid port handle if name lookup was successful. An invalid handle if the given name does not match
+   *         any existing port.
+   */
+  public PortHandle portByName(ClientHandle client, String portName) {
+    long clientHandleN =  InternalClientHandle.getReferenceFrom(client);
+    if (clientHandleN == 0) throw new RuntimeException("Invalid client handle");
+
+    long portHandleN = portByNameN(clientHandleN, portName);
+    return new InternalPortHandle(portHandleN);
+ }
+
+  private static native long portByNameN(long client,String portName);
+
   /**
    * The Jack-DLL might crash with a SIGSEGV (0xb) when confronted with an invalid regex pattern
    * like "*1".

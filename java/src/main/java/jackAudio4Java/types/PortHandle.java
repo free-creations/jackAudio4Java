@@ -16,6 +16,7 @@
 package jackAudio4Java.types;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -37,15 +38,13 @@ public class PortHandle {
    */
   protected volatile long reference;
 
-  private final String name;
-  private final PortType type;
-  private final Set<PortFlag> flags;
+  private final String name = null;
+  private final PortType type = null;
+  private final Set<PortFlag> flags = null;
+
 
   protected PortHandle(long reference, String portName, PortType portType, Set<PortFlag> portFlags) {
     this.reference = reference;
-    this.name = portName;
-    this.type = portType;
-    this.flags = Collections.unmodifiableSet(portFlags);
   }
 
   /**
@@ -62,22 +61,36 @@ public class PortHandle {
 
   /**
    * Returns the type of this port.
-   *
+   * @deprecated there are cases where might have a handle without knowing the type.
    * @return the type of this port.
    */
+  @Deprecated
   public PortType getType() {
     return type;
   }
 
   /**
    * Returns the flags given when the port was created.
-   *
+   * @deprecated there are cases where might have a handle without knowing the type.
    * @return the flags given when the port was created.
    */
+  @Deprecated
   public Set<PortFlag> getFlags() {
     return flags;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof PortHandle)) return false;
+    PortHandle handle = (PortHandle) o;
+    return reference == handle.reference;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(reference);
+  }
 
   /**
    * A port handle is considered valid, if it is not referencing a null pointer.

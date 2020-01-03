@@ -93,6 +93,22 @@ public class Jack_Level_2_Tests {
   }
 
   /**
+   * The function `Jack.portByName` shall return a valid handle for an existing port.
+   */
+  @Test
+  public void getPortByName() {
+    PortHandle handle = Jack.server().portByName(client, inputPortFullName);
+    assertThat(handle).isEqualTo(inputPortHandle);
+  }
+  /**
+   * The function `Jack.portByName` shall return an invalid handle for a nonexistent port.
+   */
+  @Test
+  public void getPortByInvalidName() {
+    PortHandle handle = Jack.server().portByName(client, "nonexistent-port");
+    assertThat(handle.isValid()).isFalse();
+  }
+  /**
    * It shall be possible to connect a systems capture-port to the clients input-port created in above initialization.
    */
   @Test

@@ -778,3 +778,35 @@ JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_connectN
 
     return result;
 }
+/**
+ * Get a port handle for a named port.
+ * <p>
+ * ## Native function reference
+ * see `jack_port_t * jack_port_by_name (jack_client_t *client, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;`
+ * at line 1292 in jack.h
+ *
+ * Class:     jackAudio4Java_Jack
+ * Method:    portByNameN
+ * Signature: (JLjava/lang/String;)J
+ *
+ * @param env             pointer to the Java environment.
+ * @param client          an opaque handle representing this client.
+ * @param portName        name of the port.
+ * @return address of the jack_port_t named port_name.
+ */
+JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portByNameN
+        (JNIEnv * env, jclass, jlong client, jstring portName){
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_portByNameN");
+
+    // transform from Java-string to UTF-8 Native string.
+    const char *portNameN = nullptr;
+    if (portName) portNameN = env->GetStringUTFChars(portName, nullptr);
+
+    // the native call
+    auto portHandle = jack_port_by_name(reinterpret_cast<jack_client_t *>(client), portNameN);
+
+    // free resources
+    if (portName) env->ReleaseStringUTFChars(portName, portNameN);
+
+    return reinterpret_cast<jlong> (portHandle);
+}
