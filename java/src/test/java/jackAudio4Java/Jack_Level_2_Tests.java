@@ -8,8 +8,8 @@ import org.junit.Test;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static jackAudio4Java.types.PortFlag.*;
+import static jackAudio4Java.types.PortType.defaultAudio;
 
 /**
  * The Level 2 unit-tests regroup all the tests that need an open connection to the
@@ -22,7 +22,8 @@ public class Jack_Level_2_Tests {
   private static final String inputPortName = "inputPort";
   private static final String outputPortName = "outputPort";
 
-  private static String[] capturePorts; // the names of physical outputs, we might try to connect.
+  private static final String inputPortFullName = clientName + ":" + inputPortName;
+  private static final String outputPortFullName = clientName + ":" + outputPortName;
 
   private static PortHandle inputPortHandle = null;
   private static PortHandle outputPortHandle = null;
@@ -31,8 +32,8 @@ public class Jack_Level_2_Tests {
    * Initialize the tests:
    * 1. Register  a new client with the jack server.
    * 2. Create some own ports.
-   * 3. Query for existing physical output ports.
-   * 4. Start the callback cycles.
+   * 3. Start the callback cycles.
+   * Now we are ready for the tests.
    */
   @BeforeClass
   public static void initialize() {
@@ -47,25 +48,21 @@ public class Jack_Level_2_Tests {
     assertThat(returnStatus.hasFailure()).isFalse();
 
     //open a new input and a new output port.
-    inputPortHandle = Jack.server().portRegister(client, inputPortName, PortType.defaultAudio(), PortFlag.setOf(isInput), 0);
+    inputPortHandle = Jack.server().portRegister(client, inputPortName, defaultAudio(), setOf(isInput), 0);
     assertThat(inputPortHandle).isNotNull();
     assertThat(inputPortHandle.isValid()).isTrue();
 
-    outputPortHandle = Jack.server().portRegister(client, outputPortName, PortType.defaultAudio(), PortFlag.setOf(isOutput), 0);
+    outputPortHandle = Jack.server().portRegister(client, outputPortName, defaultAudio(), setOf(isOutput), 0);
     assertThat(outputPortHandle).isNotNull();
     assertThat(outputPortHandle.isValid()).isTrue();
 
-    // query for physical output ports
-    capturePorts = Jack.server().getPorts(client, null, null, PortFlag.setOf(isPhysical, isOutput));
-    assertWithMessage("No audio Outputs available to test connections.").that(capturePorts).isNotEmpty();
-
-    // Tell the JACK server that we are ready to roll.  Our
-    //  process() callback will start running now.
+    // Start the  process() callbacks.
     TestProcessListener testProcessListener = new TestProcessListener();
     error = Jack.server().registerProcessListener(client, testProcessListener);
     assertThat(error).isEqualTo(0);
     error = Jack.server().activate(client);
     assertThat(error).isEqualTo(0);
+    // Now we are ready to roll.
   }
 
   /**
@@ -82,8 +79,8 @@ public class Jack_Level_2_Tests {
    */
   @Test
   public void getPortName() {
-    assertThat(Jack.server().portName(inputPortHandle)).isEqualTo(clientName + ":" + inputPortName);
-    assertThat(Jack.server().portName(outputPortHandle)).isEqualTo(clientName + ":" + outputPortName);
+    assertThat(Jack.server().portName(inputPortHandle)).isEqualTo(inputPortFullName);
+    assertThat(Jack.server().portName(outputPortHandle)).isEqualTo(outputPortFullName);
   }
 
   /**
@@ -99,9 +96,10 @@ public class Jack_Level_2_Tests {
    * It shall be possible to connect a systems capture-port to the clients input-port created in above initialization.
    */
   @Test
-  public void connectPort() {
-    int error = Jack.server().connect(client, capturePorts[0], Jack.server().portName(inputPortHandle));
+  public void connectPort() throws InterruptedException {
+    int error = Jack.server().connect(client, outputPortFullName, inputPortFullName);
     assertThat(error).isEqualTo(0);
+    // Thread.sleep(10000); // uncomment, if you want to see the connection in QjackCtl
   }
 
   /**

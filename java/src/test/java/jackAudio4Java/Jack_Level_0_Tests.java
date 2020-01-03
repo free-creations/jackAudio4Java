@@ -135,8 +135,13 @@ public class Jack_Level_0_Tests {
   /**
    * A client shall be able to register and use a __ShutdownListener__.
    *
-   * We will open a new client , register the listener than ask the operator to close the JACK connection kit
-   * (through qjackctl) The operator shall verify that he sees the message "... Hooray! The onShutdown was called".
+   * It is somewhat difficult to test the callback mechanise, because it will only work when the server
+   * is manually stopped. We are proceeding as follows:
+   *
+   * 1. We open a new client ,
+   * 2. We register the shutdown listener
+   * 3. We ask the operator to manually close the JACK server.
+   * 4. Now the operator shall verify that he sees the message "... Hooray! The onShutdown was called".
    *
    * @throws InterruptedException we'll sleep for a short while, this exception should never be thrown.
    */
@@ -157,8 +162,9 @@ public class Jack_Level_0_Tests {
     int error = Jack.server().registerShutdownListener(client, testShutdownListener);
     assertThat(error).isEqualTo(0);
 
-    System.out.println("Please close the Jack server within the next 5 seconds....");
-    Thread.sleep(5000);
+    // uncomment when you want to do the manual checks
+    // System.out.println("Please close the Jack server within the next 5 seconds....");
+    // Thread.sleep(5000);
 
     if(testShutdownListener.count == 0 ){
       Jack.server().clientClose(client);

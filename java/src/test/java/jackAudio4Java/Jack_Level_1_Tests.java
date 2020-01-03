@@ -8,8 +8,8 @@ import org.junit.Test;
 import java.util.logging.Level;
 
 import static com.google.common.truth.Truth.assertThat;
-import static jackAudio4Java.types.PortFlag.isOutput;
-import static jackAudio4Java.types.PortFlag.isPhysical;
+import static jackAudio4Java.types.PortFlag.*;
+import static jackAudio4Java.types.PortType.defaultAudio;
 
 /**
  * These unit-tests check the functions that need an open connection to the
@@ -58,7 +58,7 @@ public class Jack_Level_1_Tests {
   @Test
   public void portRegisterUnregister() {
     final String portName = "testPort";
-    PortHandle port = Jack.server().portRegister(client, portName, PortType.defaultAudio(), PortFlag.setOf(PortFlag.isInput), 0);
+    PortHandle port = Jack.server().portRegister(client, portName, defaultAudio(), setOf(isInput), 0);
     assertThat(port).isNotNull();
     assertThat(port.isValid()).isTrue();
 
@@ -128,7 +128,7 @@ public class Jack_Level_1_Tests {
   @Test
   public void getPorts() {
     String[] portNames =
-            Jack.server().getPorts(client, null, PortType.defaultAudio().toString(),
+            Jack.server().getPorts(client, null, defaultAudio().toString(),
                     PortFlag.setOf(isPhysical, isOutput));
     assertThat(portNames).isNotNull();
     assertThat(portNames.length).isAtLeast(1);

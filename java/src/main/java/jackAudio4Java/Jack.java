@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import static jackAudio4Java.types.PortFlag.isInput;
+import static jackAudio4Java.types.PortType.defaultAudio;
+
 /**
  * Here is a simple code example that queries the Jack server for its version number.
  * ```
@@ -567,9 +570,9 @@ public class Jack {
   public int portGetAudioData(PortHandle port, MutableAudioSlice inputContainer) {
     if (port == null) return -1;
     if (!port.isValid()) return -1;
-    if (!port.getType().equals(PortType.defaultAudio()))
+    if (!port.getType().equals(defaultAudio()))
       throw new RuntimeException(port.getName() + " is not an audio port");
-    if (!port.getFlags().contains(PortFlag.isInput))
+    if (!port.getFlags().contains(isInput))
       throw new RuntimeException(port.getName() + " is not an input port");
 
     if (!(port instanceof InternalPortHandle)) throw new RuntimeException("Invalid port handle");
