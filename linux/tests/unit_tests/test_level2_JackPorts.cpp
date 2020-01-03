@@ -115,3 +115,30 @@ TEST_F(TestLevel_2_Ports, getPortShortName) {
     jstring portNameJava = Java_jackAudio4Java_Jack_portShortNameN(&jniEnvMock, nullptr, inputPortHandle);
 }
 
+/**
+ * Function `Java_jackAudio4Java_Jack_connectN` shall return the  port name given
+ * in above  SetUp() method.
+ */
+TEST_F(TestLevel_2_Ports, connect) {
+
+    NiceMock<JNIEnvMock> jniEnvMock;
+
+    _jstring sourcePortJ; // the "java version" of the sourcePort name.
+    const char *sourcePortN = "Level_2_Tests:nonexistent_1"; // the "native version" of the sourcePort name.
+
+    _jstring destinationPortJ; // the "java version" of the destinationPort name.
+    const char *destinationPortN = "Level_2_Tests:nonexistent_2"; // the "native version" of the destinationPort name.
+
+    // make the jniEnvMock return sourcePortN for sourcePortJ
+    ON_CALL(jniEnvMock, GetStringUTFChars(&sourcePortJ, nullptr))
+            .WillByDefault(Return(sourcePortN));
+
+    // make the jniEnvMock return portTypeN for portTypeJ
+    ON_CALL(jniEnvMock, GetStringUTFChars(&destinationPortJ, nullptr))
+            .WillByDefault(Return(destinationPortN));
+
+    // here we go...
+    jint error = Java_jackAudio4Java_Jack_connectN(&jniEnvMock,nullptr, clientHandle, &sourcePortJ, &destinationPortJ);
+
+    EXPECT_NE(error, 0);
+}

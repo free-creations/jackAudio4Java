@@ -299,6 +299,9 @@ JNIEXPORT jlong JNICALL Java_jackAudio4Java_Jack_portRegisterN
     auto portHandle = jack_port_register(reinterpret_cast<jack_client_t *>(client), portNameN, portTypeN, portFlags,
                                          bufferSize);
 
+    if (portType) env->ReleaseStringUTFChars(portType,portTypeN);
+    if (portName) env->ReleaseStringUTFChars(portName,portNameN);
+
     return reinterpret_cast<jlong> (portHandle);
 }
 
@@ -735,4 +738,43 @@ JNIEXPORT jstring JNICALL Java_jackAudio4Java_Jack_portShortNameN
     const char *portName = jack_port_short_name(reinterpret_cast<jack_port_t *>( portHandle));
     return env->NewStringUTF(portName);
 }
+/**
+ * Establish a connection between two ports.
+ * <p>
+ * When a connection exists, data written to the __source port__ will
+ * be available to be read at the __destination port__.
+ * <p>
+ * ## Preconditions
+ * - The _port-types_ must be identical.
+ * - The  {@link PortFlag} of the __source_port__ must include {@link PortFlag#isOutput}.
+ * - The  {@link PortFlag}  of the __destination_port__ must include {@link PortFlag#isInput}.
+ *
+ * ## Native function reference
+ * see `int jack_connect(jack_client_t, const char *, const char *)` at line 993 in jack.h
+ *
+ * @param env             pointer to the Java environment.
+ * @param client          an opaque handle representing this client.
+ * @param sourcePort      the  name of the source port.
+ * @param destinationPort the  name of the destination port.
+ * @return 0 on success, EEXIST if the connection is already made,
+ *         otherwise a non-zero error code
+ */
+JNIEXPORT jint JNICALL Java_jackAudio4Java_Jack_connectN
+        (JNIEnv *env, jclass, jlong client, jstring sourcePort, jstring destinationPort) {
+    SPDLOG_TRACE("Java_jackAudio4Java_Jack_connectN");
 
+    // transform from Java-string to UTF-8 Native string.
+    const char *sourcePortN = nullptr;
+    if (sourcePort) sourcePortN = env->GetStringUTFChars(sourcePort, nullptr);
+    const char *destinationPortN = nullptr;
+    if (destinationPort) destinationPortN = env->GetStringUTFChars(destinationPort, nullptr);
+
+    // the native call
+    int result = jack_connect(reinterpret_cast<jack_client_t *>(client), sourcePortN, destinationPortN);
+
+    // free resources
+    if (destinationPort) env->ReleaseStringUTFChars(destinationPort, destinationPortN);
+    if (sourcePort) env->ReleaseStringUTFChars(sourcePort, sourcePortN);
+
+    return result;
+}

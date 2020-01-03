@@ -12,8 +12,8 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static jackAudio4Java.types.PortFlag.*;
 
 /**
- * These unit-tests check the functions that need an open connection to the
- * the Jack - audio - server and registered ports.
+ * The Level 2 unit-tests regroup all the tests that need an open connection to the
+ * the Jack - audio - server and live ports.
  */
 public class Jack_Level_2_Tests {
   private static ClientHandle client;
@@ -28,11 +28,11 @@ public class Jack_Level_2_Tests {
   private static PortHandle outputPortHandle = null;
 
   /**
-   * Initialize the tests
-   * 1. register  a new client with the jack server.
-   * 2. create some own ports
-   * 3. query for
-   *
+   * Initialize the tests:
+   * 1. Register  a new client with the jack server.
+   * 2. Create some own ports.
+   * 3. Query for existing physical output ports.
+   * 4. Start the callback cycles.
    */
   @BeforeClass
   public static void initialize() {
@@ -50,13 +50,13 @@ public class Jack_Level_2_Tests {
     inputPortHandle = Jack.server().portRegister(client, inputPortName, PortType.defaultAudio(), PortFlag.setOf(isInput), 0);
     assertThat(inputPortHandle).isNotNull();
     assertThat(inputPortHandle.isValid()).isTrue();
-    
+
     outputPortHandle = Jack.server().portRegister(client, outputPortName, PortType.defaultAudio(), PortFlag.setOf(isOutput), 0);
     assertThat(outputPortHandle).isNotNull();
     assertThat(outputPortHandle.isValid()).isTrue();
 
     // query for physical output ports
-    capturePorts = Jack.server().getPorts(client,null, null, PortFlag.setOf(isPhysical ,isOutput));
+    capturePorts = Jack.server().getPorts(client, null, null, PortFlag.setOf(isPhysical, isOutput));
     assertWithMessage("No audio Outputs available to test connections.").that(capturePorts).isNotEmpty();
 
     // Tell the JACK server that we are ready to roll.  Our
@@ -77,14 +77,13 @@ public class Jack_Level_2_Tests {
     assertThat(error).isEqualTo(0);
   }
 
-
   /**
    * The function `Jack.portName` shall return the full name of the port.
    */
   @Test
   public void getPortName() {
-    assertThat(Jack.server().portName(inputPortHandle)).isEqualTo(clientName+":"+inputPortName);
-    assertThat(Jack.server().portName(outputPortHandle)).isEqualTo(clientName+":"+outputPortName);
+    assertThat(Jack.server().portName(inputPortHandle)).isEqualTo(clientName + ":" + inputPortName);
+    assertThat(Jack.server().portName(outputPortHandle)).isEqualTo(clientName + ":" + outputPortName);
   }
 
   /**
@@ -95,6 +94,16 @@ public class Jack_Level_2_Tests {
     assertThat(Jack.server().portShortName(inputPortHandle)).isEqualTo(inputPortName);
     assertThat(Jack.server().portShortName(outputPortHandle)).isEqualTo(outputPortName);
   }
+
+  /**
+   * It shall be possible to connect a systems capture-port to the clients input-port created in above initialization.
+   */
+  @Test
+  public void connectPort() {
+    int error = Jack.server().connect(client, capturePorts[0], Jack.server().portName(inputPortHandle));
+    assertThat(error).isEqualTo(0);
+  }
+
   /**
    * A ProcessListener that simply counts the number of times,
    * the `onProcess` function has been called.
